@@ -14,6 +14,7 @@ from sympy.core import Symbol
 from sympy.logic.boolalg import And, Or
 
 
+
 def load(s):
     """Loads a boolean expression from a string.
     Examples
@@ -66,17 +67,15 @@ def load(s):
     return And(*clauses)
 
 
-def load_file(location):
+def load_file(loc1, loc2):
     """Loads a boolean expression from a file."""
-    with open(location) as f:
-        s = f.read()
+    with open(loc1) as l1:
+        with open(loc2) as l2:
+            s1 = l1.read()
+            s2 = l2.read()
+    f1 = load(s1)
+    f2 = load(s2)
+    return (f1 & f2)
 
-    return load(s)
 
-"""
-file = load_file("sudoku-example (1).txt")
-file2 = And(load_file("sudoku-rules.txt"))
-
-print (file)
-"""
 
