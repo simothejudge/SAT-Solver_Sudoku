@@ -2,6 +2,7 @@
 www.cs.ubc.ca/~hoos/SATLIB/Benchmarks/SAT/satformat.ps
 
 Source: (to mention the reference)
+TODO: add a reader for the first line, to get the size of the variable array
 """
 
 from __future__ import print_function, division
@@ -41,6 +42,7 @@ def load(s):
             m = pStats.match(line)
 
             if not m:
+                assert isinstance(line.rstrip('\n').split, object)
                 nums = line.rstrip('\n').split(' ')
                 list = []
                 for lit in nums:
@@ -70,7 +72,10 @@ def load_file(location):
 
     return load(s)
 
+"""
 file = load_file("sudoku-example (1).txt")
+file2 = And(load_file("sudoku-rules.txt"))
 
 print (file)
+"""
 

@@ -1,5 +1,7 @@
 # Sudoku-Project
 
+Similar work: https://github.com/marcmelis/dpll-sat/blob/master/solvers/original_dpll.py
+
 Reader loads 2 files : 
 The sudoku initial puzzle (partial solution) in DIMACS → first elements of our constraints, all unit clauses
 The sudoku rules in DIMACS
