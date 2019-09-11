@@ -1,12 +1,15 @@
 """For reading in DIMACS file format
 www.cs.ubc.ca/~hoos/SATLIB/Benchmarks/SAT/satformat.ps
+
+Source: (to mention the reference)
 """
 
 from __future__ import print_function, division
+
+import re
 import sympy
 from sympy.core import Symbol
 from sympy.logic.boolalg import And, Or
-import re
 
 
 def load(s):
@@ -67,8 +70,7 @@ def load_file(location):
 
     return load(s)
 
-""" Try out
 file = load_file("sudoku-example (1).txt")
 
 print (file)
-"""
+
