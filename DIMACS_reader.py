@@ -3,7 +3,6 @@ www.cs.ubc.ca/~hoos/SATLIB/Benchmarks/SAT/satformat.ps
 
 Source: (to mention the reference)
 TODO: add a reader for the first line, to get the size of the variable array
-TODO: combining the two constrains lists (partial solution+rules)
 """
 
 from __future__ import print_function, division
