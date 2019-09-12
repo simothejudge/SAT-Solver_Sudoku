@@ -15,13 +15,24 @@ def DP_solver(clauses, literals):
     if clauses not empty:
 
     else:
-        print ("Problem UNSATISFIABLE")
+
         return False
         
 def UnitPropagate(clauses, literals):
-    cont = 0
-    while clauses not empty do:
-        cont+=1
+    for (clause in clauses):
+        if len(clause)==1:
+            if int(clause)>0:
+                x = int(clause)
+                literals[x] = True
+                clauses.remove(x)
+            else:
+
+            #assign true to literals list
+            #call DP_solver over the new literals and
+    #cont = 0
+    #while clauses not empty do:
+
+     #   cont+=1
 
     print (cont)
 
@@ -37,9 +48,14 @@ def checkTaut(clauses, literals):
 def main():
     #clauses = DIMACS_reader.load_file(location_sudoku, location_rules)
     literals = [111, 112, 113, 114, 115, 116, 117]
+    #TODO: get the size of literals from DIMACS, and declaire the dict list of keys value (111, 112, ... 999) literals[x]=''
     clauses = [[168], [175], [225], [231], [318], [419], [444], [465], [493], [689], [692], [727], [732], [828], [886], [956], [961], [973], [111, 112, 113, 114, 115, 116, 117, 118, 119], [-111, -112], [-111, -113], [-111, 111]]
     clauses = checkTaut(clauses, literals)
     print (clauses)
+    #solution, literals = DP_solver(clauses, literals)
+    # if solution == false:
+        #print ("Problem UNSATISFIABLE")
+
     # call for recursive function (DP_solver)
 
 
