@@ -51,20 +51,12 @@ def load(s):
                     if lit != '':
                         if int(lit) == 0:
                             continue
-                        num = abs(int(lit))
-                        sign = True
-                        if int(lit) < 0:
-                            sign = False
-
-                        if sign:
-                            list.append(Symbol("%s" % num))
-                        else:
-                            list.append(~Symbol("%s" % num))
-
+                        num = int(lit)
+                        list.append(num)
                 if len(list) > 0:
-                    clauses.append(Or(*list))
+                    clauses.append(list)
 
-    return And(*clauses)
+    return clauses
 
 
 def load_file(loc1, loc2):
@@ -75,7 +67,13 @@ def load_file(loc1, loc2):
             s2 = l2.read()
     f1 = load(s1)
     f2 = load(s2)
-    return (f1 & f2)
+    #f1.append(f2)
+    return (f1+f2)
 
-
+""""
+location_sudoku = "sudoku-example (1).txt"
+location_rules = "sudoku-rules.txt"
+f = load_file(location_sudoku, location_rules)
+print (f)
+"""
 
