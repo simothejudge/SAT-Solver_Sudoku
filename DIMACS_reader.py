@@ -67,13 +67,13 @@ def load_file(loc1, loc2):
             s2 = l2.read()
     f1 = load(s1)
     f2 = load(s2)
-    #f1.append(f2)
     return (f1+f2)
 
-""""
+"""
 location_sudoku = "sudoku-example (1).txt"
 location_rules = "sudoku-rules.txt"
 f = load_file(location_sudoku, location_rules)
 print (f)
 """
+
 
