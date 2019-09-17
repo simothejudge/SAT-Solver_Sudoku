@@ -12,20 +12,22 @@ location_rules = "sudoku-rules.txt"
 
 
 def DP_solver(clauses, literals):
+
     if clauses not empty:
-
-    else:
-
+        else
         return False
+
+
+
         
 def UnitPropagate(clauses, literals):
-    for (clause in clauses):
-        if len(clause)==1:
-            if int(clause)>0:
-                x = int(clause)
-                literals[x] = True
-                clauses.remove(x)
-            else:
+    unit_clauses = [c for c in clauses if len(c) == 1]
+    for clause in unit_clauses:
+        x = int(clause)
+        if x > 0:
+            literals[x] = True
+        else:
+            literals[x] = False
 
             #assign true to literals list
             #call DP_solver over the new literals and
