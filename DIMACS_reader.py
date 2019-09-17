@@ -15,26 +15,14 @@ from sympy.logic.boolalg import And, Or
 
 
 def load(s):
-    """Loads a boolean expression from a string.
-    Examples
-    ========
-    >>> from sympy.logic.utilities.dimacs import load
-    >>> load('1')
-    cnf_1
-    >>> load('1 2')
-    cnf_1 | cnf_2
-    >>> load('1 \\n 2')
-    cnf_1 & cnf_2
-    >>> load('1 2 \\n 3')
-    cnf_3 & (cnf_1 | cnf_2)
-    """
+
     clauses = []
 
     lines = s.split('\n')
 
     pComment = re.compile(r'c.*')
     pStats = re.compile(r'p\s*cnf\s*(\d*)\s*(\d*)')
-
+    variables = 0
     while len(lines) > 0:
         line = lines.pop(0)
 
@@ -54,21 +42,32 @@ def load(s):
                         list.append(num)
                 if len(list) > 0:
                     clauses.append(list)
+            else:
+                infos = line.rstrip('\n').split(' ')
+                variables = int(infos[2])
 
-    return clauses
+
+    return clauses, variables
 
 
 def load_file(loc1, loc2):
     """Loads a boolean expression from a file."""
+    nvar = 0
     with open(loc1) as l1:
         with open(loc2) as l2:
             s1 = l1.read()
             s2 = l2.read()
-    f1 = load(s1)
-    f2 = load(s2)
-    return (f1+f2)
+    f1, size = load(s1)
+    if size !=0 :
+        nvar = size
+    f2, size = load(s2)
+    if size !=0 :
+        nvar = size
+    return (f1+f2), nvar
 
 """
+to test only the DIMACS reader: 
+
 location_sudoku = "sudoku-example (1).txt"
 location_rules = "sudoku-rules.txt"
 f = load_file(location_sudoku, location_rules)
