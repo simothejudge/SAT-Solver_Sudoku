@@ -13,13 +13,15 @@ location_rules = "sudoku-rules.txt"
 #TODO: TRY AND RUN ON SUDOKU TRIAL
 
 def DP_solver(clauses, literals):
-    #check unit clauses
+    #splitting check:
     for lit in literals.key() if lietrals[lit] != None:
         if literals[lit] == True:
-            # delete true clauses and simplify the negatives
+        # delete true clauses and simplify the negatives
         elif literals[lit] == False:
-            #delete false clauses and simplify the negatives
+        # delete false clauses and simplify the negatives
 
+
+    #check unit clauses
     unit_clauses = [c[0] for c in clauses if len(c) == 1]
     if unit_clauses is not {}:
         print(unit_clauses)
