@@ -70,14 +70,6 @@ def DP_solver(clauses, literals):
                 return False
 
 
-
-
-
-
-
-
-
-
 """
 def check_unit(clauses):
     unit_clauses = [c for c in clauses if len(c) == 1]
@@ -98,11 +90,6 @@ def check_unit(clauses):
 
 
 """
-
-
-        
-
-
 
 def checkTaut(clauses, literals):
     for x in literals: #literals is a list or a dic? to check
