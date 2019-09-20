@@ -1,8 +1,4 @@
-"""
-What functions we need?
-    check
 
-"""
 import DIMACS_reader
 from sympy import *
 import random
@@ -11,16 +7,28 @@ import random
 location_sudoku = "sudoku-example (1).txt"
 location_rules = "sudoku-rules.txt"
 
-#TODO: TRY AND RUN ON SUDOKU TRIAL
+#TODO: Problem of loop is solved, but still errors regarding types of objects (check clauses type cause it gives errors)
+#   error:   unit_clauses = [c[0] for c in clauses if len(c) == 1]  --> TypeError: 'int' object is not iterable
+
+#TODO: I added the call of bcp at the beginning, because I realized we simplify the clauses only when there are unit_clauses otherwise,
+#   and not when we do the splitting. Not sure it is located in the right place
+
+#TODO: Problems with the matrix design in the main (int object is not subscriptable)
 
 
 def DP_solver(clauses, literals, var, value):
 
     if var != None and value!= None:
-        literals[var] == value
+        literals[var] = value
+        if value == True:
+            clauses = bcp(clauses, var)
+        else:
+            clauses = bcp(clauses, -var)
 
     #check unit clauses
-    unit_clauses = [c[0] for c in clauses if len(c) == 1]
+    unit_clauses = []
+    if len(clauses) > 0:
+        unit_clauses = [c[0] for c in clauses if len(c) == 1]
     while len(unit_clauses)>0:
         #print(unit_clauses)
         x = int(unit_clauses[0])
@@ -106,7 +114,9 @@ def main():
         solution = [x for x in new_literals.keys() if new_literals[x] == True]
         mat = [[]]
         for cell in solution:
-            mat[cell[0]][cell[1]] = cell[2]
+            i = cell[0]
+            j = cell[1]
+            mat[i][j] = cell[2]
         print(mat)
     else:
         print("no solution for this sudoku")
