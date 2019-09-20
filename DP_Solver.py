@@ -7,33 +7,62 @@ import DIMACS_reader
 from sympy import *
 import random
 
+
 location_sudoku = "sudoku-example (1).txt"
 location_rules = "sudoku-rules.txt"
 
 #TODO: TRY AND RUN ON SUDOKU TRIAL
 
-def DP_solver(clauses, literals):
-    #splitting check:
-    for lit in literals.key() if lietrals[lit] != None:
-        if literals[lit] == True:
-        # delete true clauses and simplify the negatives
-        elif literals[lit] == False:
-        # delete false clauses and simplify the negatives
 
+
+
+
+def DP_solver(clauses, literals, var, value):
+
+    if var != None and value!= None:
+        literals[var] == value
 
     #check unit clauses
     unit_clauses = [c[0] for c in clauses if len(c) == 1]
-    if unit_clauses is not {}:
-        print(unit_clauses)
+    while len(unit_clauses)>0:
+        #print(unit_clauses)
+        x = int(unit_clauses[0])
+
+        # call the bcp for unit_clauses simplification
+        clauses = bcp(clauses, x)
+        unit_clauses = [c[0] for c in clauses if len(c) == 1]
         for unit in unit_clauses:
-            x = int(unit)
-            print ("unit clause ", x)
-            if x > 0:
-                literals[x] = True
-                print(x, literals[x])
-            elif x < 0:
-                literals[-x] = False
-                print(-x, literals[-x])
+            if -unit in unit_clauses:
+                return False, None #validation for contraddictions
+
+        # set x in literals equal to True or False
+        if x > 0:
+            literals [x] = True
+            # print(x, literals[x])
+        elif x < 0:
+            literals [-x] = False
+
+    #print(clauses)
+
+    if clauses == -1:
+        return False, None
+    if clauses == []:
+        return True, literals
+    
+    #splitting
+
+    vars = [v for v in literals.keys () if literals [v] == None]
+    # print (vars)
+    l = random.choice(vars)
+    if DP_solver(clauses,literals, l, True):
+        return True, literals
+    elif DP_solver(clauses,literals, l, False):
+        return True, literals
+    else:
+        return False, None
+    
+
+    """
             for clause in clauses:
                 if x in clause:
                     print (x, " contained in clause: ", clause, " --> removing clause")
@@ -48,27 +77,7 @@ def DP_solver(clauses, literals):
                     if len(new_clause) == 1:
                         print("adding another unit clause to unit_clauses", new_clause[0])
                         unit_clauses.append(new_clause[0])
-    if clauses is []:
-        return True
-    if clauses is None:
-        return False
-    else:
-        #splitting
-        vars = [v for v in literals.keys() if literals[v] == None]
-        #print (vars)
-        #random assignment
-        l = random.choice(vars)
-        literals[l] = True
-
-        if DP_solver(clauses, literals):
-            return True
-        else:
-            literals[l] = False
-            if DP_solver(clauses, literals):
-                return True
-            else:
-                return False
-
+    """
 
 """
 def check_unit(clauses):
@@ -87,12 +96,24 @@ def check_unit(clauses):
 
      #   cont+=1
 
-
-
 """
 
+
+def bcp(clauses, literal):
+    new_clauses = []
+    for clause in clauses:
+        if (literal not in clause) & (-literal not in clause):
+            new_clauses.append(clause)
+        elif -literal in clause:
+            new_clause = [x for x in clause if x != -literal]
+            new_clauses.append(new_clause)
+    if new_clauses == []:
+        return -1
+    return new_clauses
+
+
 def checkTaut(clauses, literals):
-    for x in literals: #literals is a list or a dic? to check
+    for x in literals:
         for clause in clauses:
             if x in clause and -x in clause:
                 #print("found a taut")
@@ -112,21 +133,24 @@ def main():
             literals[x] = None
 
     #print (size, literals)
+
     #check for tautologies just once at the beginning
     clauses = checkTaut(clauses, literals)
-    new_literals = DP_solver(clauses, literals)
-    #call the recursive DP
 
-    #literals = {111:None, 112:None, 113:None, 114:None, 115:None, 116:None, 117:None, 118:None, 119:None, 121:None}
-    #TODO: get the size of literals from DIMACS, and declaire the dict list of keys value (111, 112, ... 999) literals[x]='' take out all the variables containing 0
-    #clauses = [[111], [113], [111, 112, 113, 114, 115, 116, 117, 118, 119], [-111, -112], [-111, -113], [-111, 111]]
-
-
-    #solution, literals = DP_solver(clauses, literals)
+    #call the solver
+    check, new_literals = DP_solver(clauses, literals, None, None)
+    if check == True:
+        print ("found a solution: ")
+        solution = [x for x in new_literals.keys() if new_literals[x] == True]
+        mat = [[]]
+        for cell in solution:
+            mat[cell[0]][cell[2]] = cell[2]
+        print(mat)
+    else:
+        print("no solution for this sudoku")
+    # Print result
     # if solution == false:
         #print ("Problem UNSATISFIABLE")
-
-    # call for recursive function (DP_solver)
 
 
 if __name__ == '__main__':
