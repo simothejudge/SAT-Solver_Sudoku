@@ -63,7 +63,7 @@ def load(s):
                 variables = int(infos[2])
     return clauses, variables
 
-
+#TODO: DEBUG THIS AND CHECK HOW TO MERGE THE VARS WITH F (ONE IS A LIST OF INTEGER AND THE OTHER A LIST OF LIST)
 def load_file(loc1, loc2):
     """Loads a boolean expression from a file."""
     nvar = 0
@@ -74,8 +74,11 @@ def load_file(loc1, loc2):
     if size !=0:
         nvar = size
     clauses = []
-    for sudoku in sudokus:
-        clauses.append(sudoku+f)
+    for string in sudokus:
+        units = string.split('\n')
+        vars = [int(x[:3]) for x in units if x != '']
+        print(vars)
+        clauses.append(vars+f)
     return clauses, nvar
 
 """

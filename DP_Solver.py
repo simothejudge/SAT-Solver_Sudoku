@@ -7,13 +7,10 @@ sudokus_file = "TXT/4x4.txt"
 #location_sudoku = "sudoku-example .txt"
 location_rules = "sudoku-rules-4x4.txt"
 
-#TODO: Problem of loop is solved, but still errors regarding types of objects (check clauses type cause it gives errors)
-#   error:   unit_clauses = [c[0] for c in clauses if len(c) == 1]  --> TypeError: 'int' object is not iterable
-
-#TODO: I added the call of bcp at the beginning, because I realized we simplify the clauses only when there are unit_clauses otherwise,
-#   and not when we do the splitting. Not sure it is located in the right place
-
-#TODO: Problems with the matrix design in the main (int object is not subscriptable)
+#TODO: Literals initialisazion: to get them from the clauses set
+#TODO: check with 4x4 sudokus and 16x16 sudokus
+#TODO: Heursistics and Backtracking implementation
+#TODO: Experiments and Statistics
 
 
 def DP_solver(clauses, literals, var, value):
@@ -104,11 +101,14 @@ def main():
 
     games, n_var = DIMACS_reader.load_file(sudokus_file, location_rules)
     # pick a game
-    clauses = games[1]
+    clauses = games[0]
 
     literals = dict()  #dictionary containing for each literals (as key value) a boolean value that is initialized to None
     size = 0  # number of variables
 
+    for clause in clauses:
+        for lit in clause:
+            if abs(lit) in literals:
 
     #initialisation of the literals
     for x in range(111, n_var+1):
