@@ -127,7 +127,7 @@ def main():
     #call the solver
     check, new_literals = DP_solver(clauses, literals, None, None)
     if check == True:
-        printSolution(literals)
+        verify_solution(literals)
         # print ("found a solution: ")
         # solution = [x for x in new_literals.keys() if new_literals[x] == True]
         #
@@ -143,13 +143,44 @@ def main():
         #print ("Problem UNSATISFIABLE")
 
 
-def printSolution(literals):
+def print_solution(literals):
     matrix = [[0 for x in range(9)] for x in range(9)]
     for key, value in literals.items():
         if value:
             matrix[int(key / 100) - 1][int((key % 100) / 10) - 1] = key % 10
 
     print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
+    return matrix
+
+
+def verify_solution(literals):
+    matrix = print_solution(literals)
+    for i in range(9):
+        count = [0] * 9
+        for index in matrix[i][:]:
+            count[index-1] = count[index-1]+1
+
+        if not filter(lambda item: item != 1, count):
+            print("invalid solution for row: ", i)
+            return
+
+        count = [0] * 9
+        for index in matrix[:][i]:
+            count[index-1] = count[index-1]+1
+
+        if not filter(lambda item: item != 1, count):
+            print("invalid solution for column: ", i)
+            return
+
+        count = [0] * 9
+        for index in flatten(matrix[int(i / 3):int(i / 3)+3][(i % 3): (i % 3)+3]):
+            count[index-1] = count[index-1] + 1
+
+        if not filter(lambda item: item != 1, count):
+            print("invalid solution for block: ", int(i / 3), i % 3)
+            return
+    print("Solution is correct")
+
 
 if __name__ == '__main__':
     main()
