@@ -9,33 +9,26 @@ from __future__ import print_function,division
 import re
 
 
+def transformline(line):
+    n = len(line)
+    size = int (n ** (1 / 2))
+    sudoku = ""
+    for i in range(0, n):
+        if line [i] != '.':
+            value = line[i]
+            row = hex(int((i / size))+1)
+            col = hex((i % size)+1)
+            sudoku+=str(row)[2:].upper()+str(col)[2:].upper()+str(value)+" 0"+'\n'
+    return sudoku
+
+
 def transform(location):
     sudokus = []
     with open(location) as loc:
         page = loc.read()
         lines = page.split ('\n')
-
-        n = enumerate(lines[0])
-        size = n**(1/2)
         for line in lines:
-            col = 1
-            row = 1
-            sudoku = ""
-            for i in range(1, hex(size)) :
-                if line[j%size-1] != '.':
-
-            while row <= size:
-                char = line[col-1]
-                if col <= size:
-                    col += 1
-                else:
-                    col = 1
-                    row += 1
-                if char =! '.':
-
-
-
-
+            sudokus.append(transformline(line))
     return sudokus
 
 def load(s):
