@@ -56,7 +56,7 @@ def DP_solver(clauses, literals, var, value):
         return False, None
     if clauses == []:
         return True, literals
-    
+
     #splitting
     vars = [v for v in literals.keys () if literals[v] == None]
     # print (vars)
@@ -127,12 +127,13 @@ def main():
     #call the solver
     check, new_literals = DP_solver(clauses, literals, None, None)
     if check == True:
-        print ("found a solution: ")
-        solution = [x for x in new_literals.keys() if new_literals[x] == True]
-
-        board = [int(str(x)[2]) for x in solution]
-
-        #print_sudoku(board)
+        printSolution(literals)
+        # print ("found a solution: ")
+        # solution = [x for x in new_literals.keys() if new_literals[x] == True]
+        #
+        # board = [int(str(x)[2]) for x in solution]
+        #
+        # #print_sudoku(board)
 
 
     else:
@@ -141,6 +142,14 @@ def main():
     # if solution == false:
         #print ("Problem UNSATISFIABLE")
 
+
+def printSolution(literals):
+    matrix = [[0 for x in range(9)] for x in range(9)]
+    for key, value in literals.items():
+        if value:
+            matrix[int(key / 100) - 1][int((key % 100) / 10) - 1] = key % 10
+
+    print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
 
 if __name__ == '__main__':
     main()
