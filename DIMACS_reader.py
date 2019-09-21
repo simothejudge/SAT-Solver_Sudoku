@@ -32,7 +32,6 @@ def transform(location):
     return sudokus
 
 def load(s):
-
     clauses = []
 
     lines = s.split('\n')
@@ -62,25 +61,22 @@ def load(s):
             else:
                 infos = line.rstrip('\n').split(' ')
                 variables = int(infos[2])
-
-
     return clauses, variables
 
 
 def load_file(loc1, loc2):
     """Loads a boolean expression from a file."""
     nvar = 0
-    with open(loc1) as l1:
-        with open(loc2) as l2:
-            s1 = l1.read()
-            s2 = l2.read()
-    f1, size = load(s1)
-    if size !=0 :
+    sudokus = transform(loc1)
+    with open(loc2) as l:
+        s = l.read()
+    f, size = load(s)
+    if size !=0:
         nvar = size
-    f2, size = load(s2)
-    if size !=0 :
-        nvar = size
-    return (f1+f2), nvar
+    clauses = []
+    for sudoku in sudokus:
+        clauses.append(sudoku+f)
+    return clauses, nvar
 
 """
 to test only the DIMACS reader: 

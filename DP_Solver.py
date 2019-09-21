@@ -4,8 +4,8 @@ from sympy import *
 import random
 
 sudokus_file = "TXT/4x4.txt"
-location_sudoku = "sudoku-example .txt"
-location_rules = "sudoku-rules.txt"
+#location_sudoku = "sudoku-example .txt"
+location_rules = "sudoku-rules-4x4.txt"
 
 #TODO: Problem of loop is solved, but still errors regarding types of objects (check clauses type cause it gives errors)
 #   error:   unit_clauses = [c[0] for c in clauses if len(c) == 1]  --> TypeError: 'int' object is not iterable
@@ -99,19 +99,22 @@ def checkTaut(clauses, literals):
 
 def main():
     #4x4 sudoku transformation: return a list of stringsin DIMACS format. each string is a sudoku
-    sudokus = DIMACS_reader.transform(sudokus_file)
+    #sudokus = DIMACS_reader.transform(sudokus_file)
 
-    clauses, n_var = DIMACS_reader.load_file(location_sudoku, location_rules)
+
+    games, n_var = DIMACS_reader.load_file(sudokus_file, location_rules)
+    # pick a game
+    clauses = games[1]
+
     literals = dict()  #dictionary containing for each literals (as key value) a boolean value that is initialized to None
     size = 0  # number of variables
+
 
     #initialisation of the literals
     for x in range(111, n_var+1):
         if '0' not in str(x):
             size += 1
             literals[x] = None
-
-    #print (size, literals)
 
     #check for tautologies just once at the beginning
     clauses = checkTaut(clauses, literals)
