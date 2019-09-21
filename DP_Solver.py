@@ -29,9 +29,11 @@ def DP_solver(clauses, literals, var, value):
     unit_clauses = []
     if len(clauses) > 0:
         unit_clauses = [c[0] for c in clauses if len(c) == 1]
+        #print(unit_clauses)
     while len(unit_clauses)>0:
         #print(unit_clauses)
         x = int(unit_clauses[0])
+        #print("unit_var:", x)
 
         # call the bcp for unit_clauses simplification
         clauses = bcp(clauses, x)
@@ -59,7 +61,7 @@ def DP_solver(clauses, literals, var, value):
     vars = [v for v in literals.keys () if literals[v] == None]
     # print (vars)
     l = random.choice(vars)
-    if DP_solver(clauses,literals, l, True):
+    if DP_solver(clauses,literals, l, True) :
         return True, literals
     elif DP_solver(clauses,literals, l, False):
         return True, literals
@@ -74,11 +76,14 @@ def bcp(clauses, literal):
             continue
         elif -literal in clause:
             new_clause = [x for x in clause if x != -literal]
+            if(new_clause == []):
+                return -1
             new_clauses.append(new_clause)
         else:
             new_clauses.append(clause)
-    if new_clauses == []:
-        return -1
+    if len(new_clauses) == 0 :
+        return []
+    #print (new_clauses)
     return new_clauses
 
 
@@ -89,6 +94,18 @@ def checkTaut(clauses, literals):
                 #print("found a taut")
                 clauses.remove(clause)
     return clauses
+"""
+def print_sudoku(board):
+    print("-"*37)
+    for i, row in enumerate(board):
+        print(("|" + " {}   {}   {} |"*3).format(*[x if x != 0 else " " for x in row]))
+        if i == 8:
+            print("-"*37)
+        elif i % 3 == 2:
+            print("|" + "---+"*8 + "---|")
+        else:
+            print("|" + "   +"*8 + "   |")
+"""
 
 
 def main():
@@ -112,12 +129,12 @@ def main():
     if check == True:
         print ("found a solution: ")
         solution = [x for x in new_literals.keys() if new_literals[x] == True]
-        mat = [[]]
-        for cell in solution:
-            i = cell[0]
-            j = cell[1]
-            mat[i][j] = cell[2]
-        print(mat)
+
+        board = [int(str(x)[2]) for x in solution]
+
+        #print_sudoku(board)
+
+
     else:
         print("no solution for this sudoku")
     # Print result
