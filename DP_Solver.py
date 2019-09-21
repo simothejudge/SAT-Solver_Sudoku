@@ -3,8 +3,8 @@ import DIMACS_reader
 from sympy import *
 import random
 
-
-location_sudoku = "sudoku-example (1).txt"
+sudokus_file = "TXT/4x4.txt"
+location_sudoku = "sudoku-example .txt"
 location_rules = "sudoku-rules.txt"
 
 #TODO: Problem of loop is solved, but still errors regarding types of objects (check clauses type cause it gives errors)
@@ -109,6 +109,9 @@ def print_sudoku(board):
 
 
 def main():
+    #4x4 sudoku transformation: return a list of stringsin DIMACS format. each string is a sudoku
+    sudokus = DIMACS_reader.transform(sudokus_file)
+
     clauses, n_var = DIMACS_reader.load_file(location_sudoku, location_rules)
     literals = dict()  #dictionary containing for each literals (as key value) a boolean value that is initialized to None
     size = 0  # number of variables

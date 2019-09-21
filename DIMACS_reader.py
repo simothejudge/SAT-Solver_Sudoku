@@ -2,17 +2,36 @@
 www.cs.ubc.ca/~hoos/SATLIB/Benchmarks/SAT/satformat.ps
 
 Source: (to mention the reference)
-TODO: add a reader for the first line, to get the size of the variable array
 """
 
-from __future__ import print_function, division
+from __future__ import print_function,division
 
 import re
-import sympy
-from sympy.core import Symbol
-from sympy.logic.boolalg import And, Or
 
 
+def transform(location):
+    sudokus = []
+    with open(location) as loc:
+        page = loc.read()
+        lines = page.split ('\n')
+
+        n = enumerate(lines[0])
+        size = n**(1/2)
+        for line in lines:
+            col = 1
+            row = 1
+            while row <= size:
+                char = line[col-1]
+                if col<=size:
+                    col += 1
+                else:
+                    col=1
+                    row+=1
+                if char =! '.':
+
+
+
+    return sudokus
 
 def load(s):
 
@@ -73,5 +92,6 @@ location_rules = "sudoku-rules.txt"
 f = load_file(location_sudoku, location_rules)
 print (f)
 """
+sudokus = transform("TXT/4x4.txt")
 
 
