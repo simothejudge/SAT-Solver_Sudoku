@@ -20,14 +20,19 @@ def transform(location):
         for line in lines:
             col = 1
             row = 1
+            sudoku = ""
+            for i in range(1, hex(size)) :
+                if line[j%size-1] != '.':
+
             while row <= size:
                 char = line[col-1]
-                if col<=size:
+                if col <= size:
                     col += 1
                 else:
-                    col=1
-                    row+=1
+                    col = 1
+                    row += 1
                 if char =! '.':
+
 
 
 
