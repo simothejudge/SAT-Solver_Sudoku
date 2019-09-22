@@ -11,6 +11,7 @@ import string
 
 
 def transformline(line):
+    #transfroms each sudoku line into a dimacs format string
     n = len(line)
     size = int (n ** (1 / 2))
     sudoku = ""
@@ -28,7 +29,7 @@ def transformline(line):
 
 
 def translate(char):
-
+    # assigns letters to values for dimacs translation
     for alfa, cont in enumerate(string.ascii_uppercase):
         if char == alfa:
             return cont+10
@@ -36,7 +37,7 @@ def translate(char):
 
 
 def transform(location):
-
+    #transforms the file with sudokus into a list of strings in dimacs format
     sudokus = []
     with open(location) as loc:
         page = loc.read()
@@ -47,7 +48,7 @@ def transform(location):
 
 
 def load(s):
-
+    # gets the file of rules and puts it in a list of clauses
     lines = s.split('\n')
     pComment = re.compile(r'c.*')
     pStats = re.compile(r'p\s*cnf\s*(\d*)\s*(\d*)')
@@ -67,7 +68,7 @@ def load(s):
 
 
 def get_list(line):
-
+    #returns the clauses from a string
     clauses = []
     assert isinstance (line.rstrip ('\n').split,object)
     nums = line.rstrip ('\n').split (' ')
@@ -102,16 +103,6 @@ def get_clauses(partial, rules):
     first_clauses = get_list(partial)
     return first_clauses + rules
 
-
-"""
-to test only the DIMACS reader: 
-
-location_sudoku = "sudoku-example (1).txt"
-location_rules = "sudoku-rules.txt"
-f = load_file(location_sudoku, location_rules)
-print (f)
-sudokus = transform("TXT/4x4.txt")
-"""
 
 
 
