@@ -2,7 +2,7 @@
 www.cs.ubc.ca/~hoos/SATLIB/Benchmarks/SAT/satformat.ps
 Source: (to mention the reference)
 """
-#TODO: first call get_rules(f), then get a list of games from transform(f), then call the get_clauses to combine them
+# TODO: first call get_rules(f), then get a list of games from transform(f), then call the get_clauses to combine them
 
 from __future__ import print_function,division
 
@@ -11,9 +11,9 @@ import string
 
 
 def transformline(line):
-    #transfroms each sudoku line into a dimacs format string
+    # transforms each sudoku line into a dimacs format string
     n = len(line)
-    size = int (n ** (1 / 2))
+    size = int(n ** (1 / 2))
     sudoku = ""
 
     for i in range(0, n):
@@ -94,18 +94,20 @@ def get_rules(f):
     with open(f) as file:
         s = file.read()
     clauses, size = load(s)
-    return clauses , size
+    return clauses, size
 
 
 def get_game(f):
     # function to read the example.txt and get the list of initial constraints
-    with open (f) as file:
+    with open(f) as file:
         s = file.read ()
     partial = load(s)
     return partial
 
+
 def get_clauses(partial, rules):
-    # function to combine into the clauses of constraints both the partial initial solution (a string) and the sudoku rules (a list of list)
+    # function to combine into the clauses of constraints both
+    # the partial initial solution (a string) and the sudoku rules (a list of list)
     partial = partial.replace("0\n", "")
     first_clauses = get_list(partial)
     if '' in first_clauses:
