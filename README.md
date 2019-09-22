@@ -71,6 +71,6 @@ Splitting Optimization --> Variable Selection
         lit in small clauses
      get all the smallest clauses 
     among them, f°(x) = count the occourrencies of lit 
-    pick x: max{ [f°(x)+f°(x')]*2^k + f°(x) + f°(x') }
+    pick x: max{ [f°(x)+f°(x')]*2^k + f°(x)*f°(x') }
   
     

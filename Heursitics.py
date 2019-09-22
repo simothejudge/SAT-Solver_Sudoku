@@ -27,6 +27,18 @@ def PosNegCounter(clauses):
                 count[lit] += 1
     return count
 
+def weightedCounter(clauses):
+    sum = {}
+    for clause in clauses:
+        lamda = len(clause)
+        for lit in clause:
+            JValue = 2**(-abs(lamda))
+            if lit not in sum.keys():
+                sum[lit] = JValue
+            else:
+                sum[lit] += JValue
+    return sum
+
 
 def DLCS(clauses):
     counter = OccurenciesCounter(clauses)
@@ -35,8 +47,23 @@ def DLCS(clauses):
 def DLIS(clauses):
     counter = PosNegCounter(clauses)
     value = max(counter, key = counter.get)
-    print(value)
-    return values
+    #print(value)
+    return value
+
+def JW(clauses):
+    weighted_counter = weightedCounter(clauses)
+    return max(weighted_counter, key = weighted_counter.get)
+
+def MOM(clauses):
+    k = 1 #parameter to be set
+    shortest_clauses = min(clauses, key = len)
+    PNcounter = PosNegCounter(shortest_clauses)
+    MomValue = {}
+    for lit in PNcounter.keys():
+        function = (PNcounter[lit]+PNcounter[-lit])*2**k + (PNcounter[lit] * PNcounter[-lit])
+        MomValue[lit] = function
+    return max(MomValue, key = MomValue.get)
+
 
 """
 def main():
