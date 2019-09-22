@@ -99,7 +99,7 @@ def get_rules(f):
 def get_game(f):
     # function to read the example.txt and get the list of initial constraints
     with open(f) as file:
-        s = file.read ()
+        s = file.read()
     partial = load(s)
     return partial
 

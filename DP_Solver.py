@@ -31,31 +31,55 @@ def bcp(clauses, literal):
 def unit_propagation(clauses):
     literals = dict()
     # filter clauses if length of clause is 1
-    unit_clauses = [c[0] for c in clauses if len(c) == 1]
+    unit_clauses = list(clause for clause in clauses if len(clause) == 1)
 
-    while len(unit_clauses) > 0:
-        literal = int(unit_clauses[0])
+    for clause in unit_clauses:
+        # to get the literal as a literal not as a clause
+        literal = clause[0]
+
+        if [-literal] in unit_clauses:
+            return None, None
 
         # call the bcp for unit_clauses simplification
         clauses = bcp(clauses, literal)
-        unit_clauses = [c[0] for c in clauses if len(c) == 1]
+        if clauses is None:
+            return None, None
 
-
-        #TODO: it enters in this contraddiction check: unit = 390, apparently unit_clauses containes -390,
-        # even if I checked in the clauses and there is no unit clause for -390, only for 390
-
-        # contraddiction check
-        for unit in unit_clauses:
-            if -unit in unit_clauses:
-                return None, None
-
-        # set x in literals equal to True or False
+        # set literal in literals equal to True or False
         literals[abs(literal)] = literal > 0
-
     return literals, clauses
 
 
+# def unit_propagation(clauses):
+#     literals = dict()
+#     # filter clauses if length of clause is 1
+#     unit_clauses = [c[0] for c in clauses if len(c) == 1]
+#
+#     while len(unit_clauses) > 0:
+#         literal = int(unit_clauses[0])
+#
+#         # call the bcp for unit_clauses simplification
+#         clauses = bcp(clauses, literal)
+#         unit_clauses = [c[0] for c in clauses if len(c) == 1]
+#
+#         # TODO: it enters in this contraddiction check: unit = 390, apparently unit_clauses containes -390,
+#         # even if I checked in the clauses and there is no unit clause for -390, only for 390
+#
+#         # contradiction check
+#         for unit in unit_clauses:
+#             if -unit in unit_clauses:
+#                 return None, None
+#
+#         # set x in literals equal to True or False
+#         literals[abs(literal)] = literal > 0
+#
+#     return literals, clauses
+
+
 def dp_solver(clauses, literals):
+    if clauses is None:
+        return None
+
     unit_literals, clauses = unit_propagation(clauses)
 
     if clauses is None:
@@ -67,7 +91,7 @@ def dp_solver(clauses, literals):
         return literals
 
     # splitting
-    literal = clauses[0][0] #TODO: can be improved to make it random
+    literal = clauses[0][0]  # TODO: can be improved to make it random
     literals[literal] = True
     solution = dp_solver(bcp(clauses, literal), literals)
     if solution is None:
@@ -90,12 +114,31 @@ def remove_tautologies(clauses):
 
 def print_solution(literals):
     matrix = [[0 for x in range(9)] for x in range(9)]
-    for key, value in literals.items():
-        if value:
-            matrix[int(key / 100) - 1][int((key % 100) / 10) - 1] = key % 10
-
-    print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
+    # for key, value in literals.items():
+    #     if value:
+    #         matrix[int(key / 100) - 1][int((key % 100) / 10) - 1] = key % 10
+    #
+    # print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
     return matrix
+
+
+# def print_solution(literals):
+#     counter = 0
+#     for i in literals:
+#         if literals[i] is True:
+#             counter += 1
+#     size = int(math.sqrt(counter))
+#     if size<9:
+#         size=9
+#
+#
+#     matrix = [[0 for x in range(size)] for x in range(size)]
+#     for key, value in literals.items():
+#         if value:
+#             matrix[value % (size+1)**2-1][int(value/(size+1)) % (size+1)-1] = value % (size+1)
+#
+#     print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
+#     return matrix
 
 
 def verify_solution(literals):
@@ -140,8 +183,10 @@ def main(clauses):
         solution = [x for x in literals.keys() if literals[x] == True]
         print(solution)
         verify_solution(literals)
+        return 1
     else:
         print("no solution for this problem")
+        return 0
 
 
 if __name__ == '__main__':
@@ -151,6 +196,9 @@ if __name__ == '__main__':
 
     # to check, only one game is played at time, but needed to do a loop for testing all the games
     # choose a game in games. For example the first one (games[0])
-    clauses = DIMACS_reader.get_clauses(games[2], rules)
+    cnt = 0
+    for game in games:
+        clauses = DIMACS_reader.get_clauses(game, rules)
+        cnt += main(clauses)
 
-    main(clauses)
+    print("solved", cnt, " puzzle out of ", len(games))
