@@ -15,15 +15,19 @@ def transformline(line):
     n = len(line)
     size = int (n ** (1 / 2))
     sudoku = ""
+
     for i in range(0, n):
         if line[i] != '.':
-            if line[i] is int:
+            if line[i].isdigit():
                 value = int(line[i])
             else:
                 value = translate(line[i])
             row = int((i / size))+1
             col = (i % size)+1
-            dimacs = row*(size+1)**2+col*(size+1)+value
+            if size <= 9:
+                dimacs = "".join([str(row), str(col), str(value)])
+            else:
+                dimacs = row*(size+1)**2+col*(size+1)+value
             sudoku += str(dimacs)+" 0"+'\n'
     return sudoku
 
@@ -70,8 +74,9 @@ def load(s):
 def get_list(line):
     #returns the clauses from a string
     clauses = []
-    assert isinstance (line.rstrip ('\n').split,object)
-    nums = line.rstrip ('\n').split (' ')
+    assert isinstance(line.rstrip('\n').split,object)
+    nums = line.rstrip('\n').split (' ')
+    print(nums)
     list = []
     for lit in nums:
         if lit != '':
@@ -84,23 +89,27 @@ def get_list(line):
     return clauses
 
 
-# function to get the rules of the sudoku as a list of clauses and the number of maximum variables expected (size)
 def get_rules(f):
+    # function to get the rules of the sudoku as a list of clauses and the number of maximum variables expected (size)
     with open(f) as file:
         s = file.read()
     clauses, size = load(s)
     return clauses , size
 
-# function to read the example.txt and get the list of initial constraints
+
 def get_game(f):
+    # function to read the example.txt and get the list of initial constraints
     with open (f) as file:
         s = file.read ()
     partial = load(s)
     return partial
 
-#function to combine into the clauses of constraints both the partial initial solution (a string) and the sudoku rules (a list of list)
 def get_clauses(partial, rules):
+    # function to combine into the clauses of constraints both the partial initial solution (a string) and the sudoku rules (a list of list)
+    partial = partial.replace("0\n", "")
     first_clauses = get_list(partial)
+    if '' in first_clauses:
+        first_clauses = first_clauses.remove('')
     return first_clauses + rules
 
 

@@ -60,7 +60,7 @@ def Split(clauses,literals):
 
 def DP_solver(clauses, literals, var, value):
 
-    unit_propagation(clauses, literals)
+    unit_propagation(clauses)
     if var != None and value!= None:
         literals[var] = value
         if value == True:
@@ -98,8 +98,14 @@ def remove_tautologies(clauses):
     return list(filter(lambda clause: not is_tautology(clause), clauses))
 
 
-def main(clauses):
+def main():
     literals = dict()  #dictionary containing for each literals (as key value) a boolean value
+    rules, size = DIMACS_reader.get_rules(location_rules)
+    games = DIMACS_reader.transform(sudokus_file)
+
+    #to check, only one game is played at time, but needed to do a loop for testing all the games
+    #choose a game in games. For example the first one (games[0])
+    clauses = DIMACS_reader.get_clauses(games[0], rules)
 
     #check for tautologies just once at the beginning
     clauses = remove_tautologies(clauses)
