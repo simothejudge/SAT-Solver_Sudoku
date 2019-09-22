@@ -57,6 +57,7 @@ def load(s):
     pComment = re.compile(r'c.*')
     pStats = re.compile(r'p\s*cnf\s*(\d*)\s*(\d*)')
     variables = 0
+    clauses = []
     while len(lines) > 0:
         line = lines.pop(0)
 
@@ -64,7 +65,9 @@ def load(s):
         if not pComment.match(line):
             m = pStats.match(line)
             if not m:
-                clauses = get_list(line)
+                clause = get_list(line)
+                if clause:
+                    clauses.append(clause)
             else:
                 infos = line.rstrip('\n').split(' ')
                 variables = int(infos[2])
@@ -72,21 +75,18 @@ def load(s):
 
 
 def get_list(line):
-    #returns the clauses from a string
-    clauses = []
-    assert isinstance(line.rstrip('\n').split,object)
-    nums = line.rstrip('\n').split (' ')
+    # returns the clauses from a string
+    clause = []
+    assert isinstance(line.rstrip('\n').split, object)
+    nums = line.rstrip('\n').split(' ')
     print(nums)
-    list = []
     for lit in nums:
         if lit != '':
             if int(lit) == 0:
                 continue
-            num = int (lit)
-            list.append (num)
-    if len (list) > 0:
-        clauses.append (list)
-    return clauses
+            num = int(lit)
+            clause.append(num)
+    return clause
 
 
 def get_rules(f):
@@ -110,7 +110,8 @@ def get_clauses(partial, rules):
     first_clauses = get_list(partial)
     if '' in first_clauses:
         first_clauses = first_clauses.remove('')
-    return first_clauses + rules
+
+    return list(([clause] for clause in first_clauses)) + rules
 
 
 

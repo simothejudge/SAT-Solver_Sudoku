@@ -1,89 +1,75 @@
-
 import DIMACS_reader
 from sympy import *
 import random
 
 sudokus_file = "TXT/4x4.txt"
-#location_sudoku = "sudoku-example .txt"
+# location_sudoku = "sudoku-example .txt"
 location_rules = "sudoku-rules-4x4.txt"
 
-#TODO: Literals initialisazion: to get them from the clauses set
-#TODO: check with 4x4 sudokus and 16x16 sudokus
-#TODO: Heursistics and Backtracking implementation
-#TODO: Experiments and Statistics
 
+# TODO: Literals initialisazion: to get them from the clauses set
+# TODO: check with 4x4 sudokus and 16x16 sudokus
+# TODO: Heursistics and Backtracking implementation
+# TODO: Experiments and Statistics
 
-def unit_propagation(clauses):
-    unit_literals = dict()
-    unit_clauses = list(filter(lambda clause: len(clause) == 1, clauses))
-    for clause in unit_clauses:
-        clauses.remove(clause)
-    return dict((clause[0], True) for clause in unit_clauses), clauses
-    #
-    # while len(unit_clauses) > 0:
-    #     literal = int(unit_clauses[0])
-    #
-    #     # call the bcp for unit_clauses simplification
-    #     clauses = bcp(clauses, literal)
-    #     unit_clauses = [c[0] for c in clauses if len(c) == 1]
-    #
-    #     # contradiction check
-    #     for unit in unit_clauses:
-    #         if -unit in unit_clauses:
-    #             return False, None
-    #
-    #     # set x in literals equal to True or False
-    #     if literal > 0:
-    #         literals[literal] = True
-    #         # print(x, literals[x])
-    #     elif literal < 0:
-    #         literals[-literal] = False
-    #
-    # # print(clauses)
-    # if clauses == -1:
-    #     return False, None
-    # if clauses == []:
-    #     return True, literals
-
-def Split(clauses,literals):
-
-    vars = [v for v in literals.keys () if literals[v] == None]
-    # print (vars)
-    l = random.choice(vars)
-    if DP_solver(clauses,literals, l, True) :
-        return True, literals
-    elif DP_solver(clauses,literals, l, False):
-        return True, literals
-    else:
-        return False, None
-
-
-def DP_solver(clauses, literals, var, value):
-
-    unit_propagation(clauses)
-    if var != None and value!= None:
-        literals[var] = value
-        if value == True:
-            clauses = bcp(clauses, var)
-        else:
-            clauses = bcp(clauses, -var)
 
 def bcp(clauses, literal):
-    new_clauses = []
+    simplified_clauses = []
     for clause in clauses:
         if literal in clause:
             continue
         elif -literal in clause:
             new_clause = [x for x in clause if x != -literal]
-            if(new_clause == []):
-                return -1
-            new_clauses.append(new_clause)
+            if not new_clause:
+                return None
+            simplified_clauses.append(new_clause)
         else:
-            new_clauses.append(clause)
-    if len(new_clauses) == 0 :
+            simplified_clauses.append(clause)
+    if len(simplified_clauses) == 0:
         return []
-    #print (new_clauses)
-    return new_clauses
+    return simplified_clauses
+
+
+def unit_propagation(clauses):
+    literals = dict()
+    # filter clauses if length of clause is 1
+    unit_clauses = [c[0] for c in clauses if len(c) == 1]
+
+    while len(unit_clauses) > 0:
+        literal = int(unit_clauses[0])
+
+        # call the bcp for unit_clauses simplification
+        clauses = bcp(clauses, literal)
+        unit_clauses = [c[0] for c in clauses if len(c) == 1]
+
+        # contraddiction check
+        for unit in unit_clauses:
+            if -unit in unit_clauses:
+                return None
+
+        # set x in literals equal to True or False
+        literals[abs(literal)] = literal > 0
+
+    return literals, clauses
+
+
+def dp_solver(clauses, literals):
+    unit_literals, clauses = unit_propagation(clauses)
+    literals.update(unit_literals)
+
+    if clauses is None:
+        return None
+    if not clauses:
+        return literals
+
+    # splitting
+    literal = clauses[0][0]
+    literals[literal] = True
+    solution = dp_solver(bcp(clauses, literal), literals)
+    if solution is None:
+        literals[literal] = False
+        solution = dp_solver(bcp(clauses, -literal), literals)
+    return solution
 
 
 def is_tautology(clause):
@@ -96,37 +82,6 @@ def is_tautology(clause):
 def remove_tautologies(clauses):
     # return list((clause for clause in clauses if not is_clause_tautology(clause)))
     return list(filter(lambda clause: not is_tautology(clause), clauses))
-
-
-def main():
-    literals = dict()  #dictionary containing for each literals (as key value) a boolean value
-    rules, size = DIMACS_reader.get_rules(location_rules)
-    games = DIMACS_reader.transform(sudokus_file)
-
-    #to check, only one game is played at time, but needed to do a loop for testing all the games
-    #choose a game in games. For example the first one (games[0])
-    clauses = DIMACS_reader.get_clauses(games[0], rules)
-
-    #check for tautologies just once at the beginning
-    clauses = remove_tautologies(clauses)
-
-    #call the solver
-    check, new_literals = DP_solver(clauses, literals, None, None)
-    if check == True:
-        verify_solution(literals)
-        # print ("found a solution: ")
-        # solution = [x for x in new_literals.keys() if new_literals[x] == True]
-        #
-        # board = [int(str(x)[2]) for x in solution]
-        #
-        # #print_sudoku(board)
-
-
-    else:
-        print("no solution for this sudoku")
-    # Print result
-    # if solution == false:
-        #print ("Problem UNSATISFIABLE")
 
 
 def print_solution(literals):
@@ -144,7 +99,7 @@ def verify_solution(literals):
     for i in range(9):
         count = [0] * 9
         for index in matrix[i][:]:
-            count[index-1] = count[index-1]+1
+            count[index - 1] = count[index - 1] + 1
 
         if not filter(lambda item: item != 1, count):
             print("invalid solution for row: ", i)
@@ -152,15 +107,15 @@ def verify_solution(literals):
 
         count = [0] * 9
         for index in matrix[:][i]:
-            count[index-1] = count[index-1]+1
+            count[index - 1] = count[index - 1] + 1
 
         if not filter(lambda item: item != 1, count):
             print("invalid solution for column: ", i)
             return
 
         count = [0] * 9
-        for index in flatten(matrix[int(i / 3):int(i / 3)+3][(i % 3): (i % 3)+3]):
-            count[index-1] = count[index-1] + 1
+        for index in flatten(matrix[int(i / 3):int(i / 3) + 3][(i % 3): (i % 3) + 3]):
+            count[index - 1] = count[index - 1] + 1
 
         if not filter(lambda item: item != 1, count):
             print("invalid solution for block: ", int(i / 3), i % 3)
@@ -168,5 +123,27 @@ def verify_solution(literals):
     print("Solution is correct")
 
 
+def main(clauses):
+    # dictionary containing for each literals (as key value) a boolean value
+    literals = dict()
+
+    # check for tautologies just once at the beginning
+    clauses = remove_tautologies(clauses)
+
+    # call the solver
+    literals = dp_solver(clauses, literals)
+    if literals:
+        verify_solution(literals)
+    else:
+        print("no solution for this problem")
+
+
 if __name__ == '__main__':
-    main()
+    rules, size = DIMACS_reader.get_rules(location_rules)
+    games = DIMACS_reader.transform(sudokus_file)
+
+    # to check, only one game is played at time, but needed to do a loop for testing all the games
+    # choose a game in games. For example the first one (games[0])
+    clauses = DIMACS_reader.get_clauses(games[0], rules)
+
+    main(clauses)
