@@ -13,48 +13,40 @@ location_rules = "sudoku-rules-4x4.txt"
 #TODO: Experiments and Statistics
 
 
-def DP_solver(clauses, literals, var, value):
+def unit_propagation(clauses):
+    unit_literals = dict()
+    unit_clauses = list(filter(lambda clause: len(clause) == 1, clauses))
+    for clause in unit_clauses:
+        clauses.remove(clause)
+    return dict((clause[0], True) for clause in unit_clauses), clauses
+    #
+    # while len(unit_clauses) > 0:
+    #     literal = int(unit_clauses[0])
+    #
+    #     # call the bcp for unit_clauses simplification
+    #     clauses = bcp(clauses, literal)
+    #     unit_clauses = [c[0] for c in clauses if len(c) == 1]
+    #
+    #     # contradiction check
+    #     for unit in unit_clauses:
+    #         if -unit in unit_clauses:
+    #             return False, None
+    #
+    #     # set x in literals equal to True or False
+    #     if literal > 0:
+    #         literals[literal] = True
+    #         # print(x, literals[x])
+    #     elif literal < 0:
+    #         literals[-literal] = False
+    #
+    # # print(clauses)
+    # if clauses == -1:
+    #     return False, None
+    # if clauses == []:
+    #     return True, literals
 
-    if var != None and value!= None:
-        literals[var] = value
-        if value == True:
-            clauses = bcp(clauses, var)
-        else:
-            clauses = bcp(clauses, -var)
+def Split(clauses,literals):
 
-    #check unit clauses
-    unit_clauses = []
-    if len(clauses) > 0:
-        unit_clauses = [c[0] for c in clauses if len(c) == 1]
-        #print(unit_clauses)
-    while len(unit_clauses)>0:
-        #print(unit_clauses)
-        x = int(unit_clauses[0])
-        #print("unit_var:", x)
-
-        # call the bcp for unit_clauses simplification
-        clauses = bcp(clauses, x)
-        unit_clauses = [c[0] for c in clauses if len(c) == 1]
-
-        # contraddiction check
-        for unit in unit_clauses:
-            if -unit in unit_clauses:
-                return False, None
-
-        # set x in literals equal to True or False
-        if x > 0:
-            literals [x] = True
-            # print(x, literals[x])
-        elif x < 0:
-            literals [-x] = False
-
-    #print(clauses)
-    if clauses == -1:
-        return False, None
-    if clauses == []:
-        return True, literals
-
-    #splitting
     vars = [v for v in literals.keys () if literals[v] == None]
     # print (vars)
     l = random.choice(vars)
@@ -65,6 +57,16 @@ def DP_solver(clauses, literals, var, value):
     else:
         return False, None
 
+
+def DP_solver(clauses, literals, var, value):
+
+    unit_propagation(clauses, literals)
+    if var != None and value!= None:
+        literals[var] = value
+        if value == True:
+            clauses = bcp(clauses, var)
+        else:
+            clauses = bcp(clauses, -var)
 
 def bcp(clauses, literal):
     new_clauses = []
@@ -84,40 +86,23 @@ def bcp(clauses, literal):
     return new_clauses
 
 
-def checkTaut(clauses, literals):
-    for x in literals:
-        for clause in clauses:
-            if x in clause and -x in clause:
-                #print("found a taut")
-                clauses.remove(clause)
-    return clauses
+def is_tautology(clause):
+    for literal in clause:
+        if -literal in clause:
+            return True
+    return False
 
 
+def remove_tautologies(clauses):
+    # return list((clause for clause in clauses if not is_clause_tautology(clause)))
+    return list(filter(lambda clause: not is_tautology(clause), clauses))
 
-def main():
-    #4x4 sudoku transformation: return a list of stringsin DIMACS format. each string is a sudoku
-    #sudokus = DIMACS_reader.transform(sudokus_file)
 
-
-    games, n_var = DIMACS_reader.load_file(sudokus_file, location_rules)
-    # pick a game
-    clauses = games[0]
-
-    literals = dict()  #dictionary containing for each literals (as key value) a boolean value that is initialized to None
-    size = 0  # number of variables
-
-    for clause in clauses:
-        for lit in clause:
-            if abs(lit) in literals:
-
-    #initialisation of the literals
-    for x in range(111, n_var+1):
-        if '0' not in str(x):
-            size += 1
-            literals[x] = None
+def main(clauses):
+    literals = dict()  #dictionary containing for each literals (as key value) a boolean value
 
     #check for tautologies just once at the beginning
-    clauses = checkTaut(clauses, literals)
+    clauses = remove_tautologies(clauses)
 
     #call the solver
     check, new_literals = DP_solver(clauses, literals, None, None)
