@@ -45,7 +45,7 @@ def unit_propagation(clauses):
         # contraddiction check
         for unit in unit_clauses:
             if -unit in unit_clauses:
-                return None
+                return None, None
 
         # set x in literals equal to True or False
         literals[abs(literal)] = literal > 0
@@ -55,10 +55,12 @@ def unit_propagation(clauses):
 
 def dp_solver(clauses, literals):
     unit_literals, clauses = unit_propagation(clauses)
-    literals.update(unit_literals)
 
     if clauses is None:
         return None
+
+    literals.update(unit_literals)
+
     if not clauses:
         return literals
 
