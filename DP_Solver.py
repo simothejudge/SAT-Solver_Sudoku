@@ -2,13 +2,11 @@ import DIMACS_reader
 from sympy import *
 import random
 
-sudokus_file = "TXT/4x4.txt"
+sudokus_file = "TXT/16x16.txt"
 # location_sudoku = "sudoku-example .txt"
-location_rules = "sudoku-rules-4x4.txt"
+location_rules = "sudoku-rules-16x16.txt"
 
 
-# TODO: Literals initialisazion: to get them from the clauses set
-# TODO: check with 4x4 sudokus and 16x16 sudokus
 # TODO: Heursistics and Backtracking implementation
 # TODO: Experiments and Statistics
 
@@ -42,6 +40,10 @@ def unit_propagation(clauses):
         clauses = bcp(clauses, literal)
         unit_clauses = [c[0] for c in clauses if len(c) == 1]
 
+
+        #TODO: it enters in this contraddiction check: unit = 390, apparently unit_clauses containes -390,
+        # even if I checked in the clauses and there is no unit clause for -390, only for 390
+
         # contraddiction check
         for unit in unit_clauses:
             if -unit in unit_clauses:
@@ -65,7 +67,7 @@ def dp_solver(clauses, literals):
         return literals
 
     # splitting
-    literal = clauses[0][0]
+    literal = clauses[0][0] #TODO: can be improved to make it random
     literals[literal] = True
     solution = dp_solver(bcp(clauses, literal), literals)
     if solution is None:
@@ -135,17 +137,20 @@ def main(clauses):
     # call the solver
     literals = dp_solver(clauses, literals)
     if literals:
+        solution = [x for x in literals.keys() if literals[x] == True]
+        print(solution)
         verify_solution(literals)
     else:
         print("no solution for this problem")
 
 
 if __name__ == '__main__':
+
     rules, size = DIMACS_reader.get_rules(location_rules)
     games = DIMACS_reader.transform(sudokus_file)
 
     # to check, only one game is played at time, but needed to do a loop for testing all the games
     # choose a game in games. For example the first one (games[0])
-    clauses = DIMACS_reader.get_clauses(games[0], rules)
+    clauses = DIMACS_reader.get_clauses(games[2], rules)
 
     main(clauses)

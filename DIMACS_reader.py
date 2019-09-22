@@ -79,7 +79,6 @@ def get_list(line):
     clause = []
     assert isinstance(line.rstrip('\n').split, object)
     nums = line.rstrip('\n').split(' ')
-    print(nums)
     for lit in nums:
         if lit != '':
             if int(lit) == 0:
