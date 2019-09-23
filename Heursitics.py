@@ -46,8 +46,8 @@ def DLCS(clauses):
 #TODO: try to call it
 def DLIS(clauses):
     counter = PosNegCounter(clauses)
-    max_freq = max (counter.values ())
-    return [x for x in counter.keys () if counter [x] == max_freq]
+    max_freq = max(counter.values())
+    return [x for x in counter.keys() if counter[x] == max_freq]
 
 #TODO: try to call it
 def JW(clauses):

@@ -231,14 +231,14 @@ def main(clauses):
     # check for tautologies just once at the beginning
     clauses = remove_tautologies(clauses)
 
-    start = time.time ()
+    start = time.time()
 
     # call the solver
-    literals = dp_solver (clauses,literals)
+    literals = dp_solver(clauses, literals)
 
     # process time for the recursive algorithm
-    process_time = time.time () - start
-    print ("DP_Solver Process time: " + str (process_time))
+    process_time = time.time() - start
+    print("DP_Solver Process time: " + str(process_time))
 
     if literals:
         solution = [x for x in literals.keys() if literals[x] == True]
