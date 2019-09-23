@@ -9,10 +9,11 @@ def OccurenciesCounter(clauses):
     count = {}
     for clause in clauses:
         for lit in clause:
-            if abs(lit) not in count.keys():
-                count[abs(lit)] = 1
+            lit = abs(lit)
+            if lit not in count.keys():
+                count[lit] = 1
             else:
-                count[abs(lit)] += 1
+                count[lit] += 1
     return count
 
 def PosNegCounter(clauses):
@@ -47,7 +48,6 @@ def DLCS(clauses):
 def DLIS(clauses):
     counter = PosNegCounter(clauses)
     value = max(counter, key = counter.get)
-    #print(value)
     return value
 
 def JW(clauses):

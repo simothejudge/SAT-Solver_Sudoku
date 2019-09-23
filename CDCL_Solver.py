@@ -2,15 +2,13 @@ import DIMACS_reader
 from sympy import *
 import random
 import time, timeit
-import Heursitics
 
 sudokus_file = "TXT/1000 sudokus.txt"
 # location_sudoku = "sudoku-example .txt"
 location_rules = "sudoku-rules.txt"
 
 
-# TODO: Heursistics and Backtracking implementation
-# TODO: Experiments and Statistics
+# TODO: Backtracking implementation
 
 
 def bcp(clauses, literal):
@@ -36,7 +34,7 @@ def unit_propagation(clauses):
     unit_clauses = list(clause for clause in clauses if len(clause) == 1)
 
     for clause in unit_clauses:
-        # for every unit in teh list of unit_clauses we simplify the clauses and set literals to true
+        # to get the literal as a literal not as a clause
         literal = clause[0]
 
         if [-literal] in unit_clauses:
@@ -64,6 +62,7 @@ def unit_propagation(clauses):
 #         clauses = bcp(clauses, literal)
 #         unit_clauses = [c[0] for c in clauses if len(c) == 1]
 #
+#         # TODO: it enters in this contraddiction check: unit = 390, apparently unit_clauses containes -390,
 #         # even if I checked in the clauses and there is no unit clause for -390, only for 390
 #
 #         # contradiction check
@@ -91,14 +90,8 @@ def dp_solver(clauses, literals):
     if not clauses:
         return literals
 
-    # SPLITTING
-    # 1) random choice
-    #literal = var_selection(clauses)
-
-    # 2) Heuristic 1
-
-    literal = random.choice()
-
+    # splitting
+    literal = clauses[0][0]  # TODO: can be improved to make it random
     literals[literal] = True
     solution = dp_solver(bcp(clauses, literal), literals)
     if solution is None:
@@ -120,38 +113,38 @@ def remove_tautologies(clauses):
 
 
 def print_solution(literals):
-    counter = 0
-    for i in literals:
-        if literals[i] is True:
-            counter += 1
-    size = int(math.sqrt(counter))
-
-    if size < 10:
-        base = 10
-    else:
-        base = 17
-
-    matrix = [[0 for x in range(size)] for x in range(size)]
-    for key, value in literals.items():
-        if key > 0 and value:
-            matrix[int((key / base ** 2)) - 1][int(key / base) % base - 1] = key % base
-
-    print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
+    matrix = [[0 for x in range(9)] for x in range(9)]
+    # for key, value in literals.items():
+    #     if value:
+    #         matrix[int(key / 100) - 1][int((key % 100) / 10) - 1] = key % 10
+    #
+    # print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
     return matrix
 
-def var_selection(clauses):
-    # random choice:
-    vars = []
-    for clause in clauses:
-        vars += [abs (x) for x in clause if abs (x) not in vars]
-    literal = random.choice (vars)
-    return literal
+
+# def print_solution(literals):
+#     counter = 0
+#     for i in literals:
+#         if literals[i] is True:
+#             counter += 1
+#     size = int(math.sqrt(counter))
+#     if size<9:
+#         size=9
+#
+#
+#     matrix = [[0 for x in range(size)] for x in range(size)]
+#     for key, value in literals.items():
+#         if value:
+#             matrix[value % (size+1)**2-1][int(value/(size+1)) % (size+1)-1] = value % (size+1)
+#
+#     print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
+#     return matrix
+
 
 def verify_solution(literals):
     matrix = print_solution(literals)
-    size = len(matrix)
-    for i in range(size - 1):
-        count = [0] * size
+    for i in range(9):
+        count = [0] * 9
         for index in matrix[i][:]:
             count[index - 1] = count[index - 1] + 1
 
@@ -159,7 +152,7 @@ def verify_solution(literals):
             print("invalid solution for row: ", i)
             return
 
-        count = [0] * size
+        count = [0] * 9
         for index in matrix[:][i]:
             count[index - 1] = count[index - 1] + 1
 
@@ -167,14 +160,12 @@ def verify_solution(literals):
             print("invalid solution for column: ", i)
             return
 
-        count = [0] * size
-        block_size = int(size ** (1 / 2))
-        for index in flatten(matrix[int(i / block_size):int(i / block_size) + block_size - 1][
-                             (i % block_size): (i % block_size) + block_size - 1]):
+        count = [0] * 9
+        for index in flatten(matrix[int(i / 3):int(i / 3) + 3][(i % 3): (i % 3) + 3]):
             count[index - 1] = count[index - 1] + 1
 
         if not filter(lambda item: item != 1, count):
-            print("invalid solution for block: ", int(i / block_size), i % block_size)
+            print("invalid solution for block: ", int(i / 3), i % 3)
             return
     print("Solution is correct")
 
@@ -212,21 +203,9 @@ if __name__ == '__main__':
 
     # to check, only one game is played at time, but needed to do a loop for testing all the games
     # choose a game in games. For example the first one (games[0])
-
-    times = []
-    total_time = 0
+    cnt = 0
     for game in games:
         clauses = DIMACS_reader.get_clauses(game, rules)
+        cnt += main(clauses)
 
-        start = time.time()
-        solution = main(clauses)
-        runtime = time.time() - start
-
-        if solution:
-            total_time += runtime
-            times.append(runtime)
-        else:
-            print("no solution for game :", games.index(game))
-
-    print("solved", len(times), " puzzle out of ", len(games),
-          " games on average time:", numpy.mean(times), " with a std of ", numpy.std(times))
+    print("solved", cnt, " puzzle out of ", len(games))

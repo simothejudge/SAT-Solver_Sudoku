@@ -72,5 +72,13 @@ Splitting Optimization --> Variable Selection
      get all the smallest clauses 
     among them, f°(x) = count the occourrencies of lit 
     pick x: max{ [f°(x)+f°(x')]*2^k + f°(x)*f°(x') }
+ 
+ **CDCL_Solver.py**
   
+  
+  
+****HYPOTHESIS:**** 
+- hard sudokus for people are also hard for computer (based on the process time)
+- difficulty and size relationship? quadratically, exponential, log?
+- 
     
