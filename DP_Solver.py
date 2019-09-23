@@ -92,12 +92,7 @@ def dp_solver(clauses, literals):
         return literals
 
     # SPLITTING
-    # 1) random choice
-    #literal = var_selection(clauses)
-
-    # 2) Heuristic 1
-
-    literal = random.choice()
+    literal = var_selection(clauses)
 
     literals[literal] = True
     solution = dp_solver(bcp(clauses, literal), literals)
@@ -118,6 +113,7 @@ def remove_tautologies(clauses):
     # return list((clause for clause in clauses if not is_clause_tautology(clause)))
     return list(filter(lambda clause: not is_tautology(clause), clauses))
 
+"""
 
 def print_solution(literals):
     counter = 0
@@ -138,17 +134,41 @@ def print_solution(literals):
 
     print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
     return matrix
+"""
 
 def var_selection(clauses):
-    # random choice:
+    # comment and uncomment the heuristic that you want to try among:
+
+    # return random_selection(clauses)
+     return DLCS_random(clauses)
+    # return DLIS_random(clauses)
+    # return WJ_random(clauses)
+    # return MOM_random(clauses)
+
+
+def random_selection(clauses):
     vars = []
+    # 1) random choices
     for clause in clauses:
         vars += [abs (x) for x in clause if abs (x) not in vars]
     literal = random.choice (vars)
     return literal
 
+def DLCS_random(clauses):
+    # 2) Heuristic 1:  DLCS + random choice
+    values = Heursitics.DLCS(clauses)
+    literal = random.choice (values)
+    return literal
+
+def DLIS_random(clauses):
+    # 3) Heuristic 2:  DLIS + random choice
+    values = Heursitics.DLIS(clauses)
+    literal = random.choice (values)
+    return literal
+
+
 def verify_solution(literals):
-    matrix = print_solution(literals)
+    #matrix = print_solution(literals)
     size = len(matrix)
     for i in range(size - 1):
         count = [0] * size
@@ -198,7 +218,7 @@ def main(clauses):
     if literals:
         solution = [x for x in literals.keys() if literals[x] == True]
         print(solution)
-        verify_solution(literals)
+        #verify_solution(literals)
         return 1
     else:
         print("no solution for this problem")

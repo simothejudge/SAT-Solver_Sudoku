@@ -43,12 +43,13 @@ def weightedCounter(clauses):
 
 def DLCS(clauses):
     counter = OccurenciesCounter(clauses)
-    return max(counter, key = counter.get)
+    max_freq = max(counter.values())
+    return [x for x in counter.keys() if counter[x] == max_freq]
 
 def DLIS(clauses):
     counter = PosNegCounter(clauses)
-    value = max(counter, key = counter.get)
-    return value
+    max_freq = max (counter.values ())
+    return [x for x in counter.keys () if counter [x] == max_freq]
 
 def JW(clauses):
     weighted_counter = weightedCounter(clauses)
