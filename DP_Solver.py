@@ -4,12 +4,13 @@ import random
 import time, timeit
 import Heursitics
 
-sudokus_file = "TXT/1000 sudokus.txt"
+sudokus_file = "TXT/top91.sdk.txt"
 # location_sudoku = "sudoku-example .txt"
 location_rules = "sudoku-rules.txt"
 
-
-# TODO: Heursistics and Backtracking implementation
+# TODO: process time has increased: it takes too much even with random selection and even more with the DLSC
+# TODO: test the WJ and MOM
+# TODO: Heursistics checking
 # TODO: Experiments and Statistics
 
 
@@ -39,6 +40,7 @@ def unit_propagation(clauses):
         # for every unit in teh list of unit_clauses we simplify the clauses and set literals to true
         literal = clause[0]
 
+        #contraddiction check
         if [-literal] in unit_clauses:
             return None, None
 
@@ -94,7 +96,11 @@ def dp_solver(clauses, literals):
     # SPLITTING
     literal = var_selection(clauses)
 
-    literals[literal] = True
+    if literal>0:
+        literals[literal] = True
+    else:
+        literals [-literal] = False
+
     solution = dp_solver(bcp(clauses, literal), literals)
     if solution is None:
         literals[literal] = False
@@ -136,6 +142,9 @@ def print_solution(literals):
     return matrix
 """
 
+
+#########  heuristic functions ###########
+
 def var_selection(clauses):
     # comment and uncomment the heuristic that you want to try among:
 
@@ -166,6 +175,13 @@ def DLIS_random(clauses):
     literal = random.choice (values)
     return literal
 
+def WJ_random(clauses):
+    values = Heursitics.WJ(clauses)
+    literal = random.choice (values)
+    return literal
+
+def MOM_random(clauses):
+    return
 
 def verify_solution(literals):
     #matrix = print_solution(literals)

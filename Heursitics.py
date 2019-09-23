@@ -1,6 +1,3 @@
-
-
-#implementing DLCS and DLIS
 # functions are called from Split(), receiving the clauses and making calculations out of it and give back the literal and its value
 
 # First Heuristic:
@@ -40,21 +37,25 @@ def weightedCounter(clauses):
                 sum[lit] += JValue
     return sum
 
-
+#TODO: process time for each sudoku too long, how come?
 def DLCS(clauses):
     counter = OccurenciesCounter(clauses)
     max_freq = max(counter.values())
     return [x for x in counter.keys() if counter[x] == max_freq]
 
+#TODO: try to call it
 def DLIS(clauses):
     counter = PosNegCounter(clauses)
     max_freq = max (counter.values ())
     return [x for x in counter.keys () if counter [x] == max_freq]
 
+#TODO: try to call it
 def JW(clauses):
     weighted_counter = weightedCounter(clauses)
-    return max(weighted_counter, key = weighted_counter.get)
+    max_freq = max (weighted_counter.values())
+    return [x for x in weighted_counter.keys () if weighted_counter[x] == max_freq]
 
+#TODO: function MOM needs to be checked, and try to call it
 def MOM(clauses):
     k = 1 #parameter to be set
     shortest_clauses = min(clauses, key = len)
@@ -65,11 +66,3 @@ def MOM(clauses):
         MomValue[lit] = function
     return max(MomValue, key = MomValue.get)
 
-
-"""
-def main():
-
-
-if __name__ == '__main__':
-    main()
-"""
