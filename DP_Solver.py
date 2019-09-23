@@ -4,9 +4,18 @@ import random
 import time, timeit
 import Heursitics
 
-sudokus_file = "TXT/top91.sdk.txt"
-# location_sudoku = "sudoku-example .txt"
+# 4x4
+# sudokus_file = "TXT/4x4.txt"
+# location_rules = "sudoku-rules-4x4.txt"
+
+# 9x9
+sudokus_file = "TXT/1000 sudokus.txt"
+# sudokus_file = "TXT/top100.sdk.txt"  # average time: 2.5473659467697143  with a std of  2.757161616124923
 location_rules = "sudoku-rules.txt"
+
+# 16x16
+# sudokus_file = "TXT/16x16.txt"
+# location_rules = "sudoku-rules-16x16.txt"
 
 # TODO: process time has increased: it takes too much even with random selection and even more with the DLSC
 # TODO: test the WJ and MOM
