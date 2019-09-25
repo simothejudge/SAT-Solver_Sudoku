@@ -38,18 +38,25 @@ def weightedCounter(clauses):
     return sum
 
 #TODO: process time for each sudoku too long, how come?
+"""
+def DLCS(clauses):
+    counter = OccurenciesCounter(clauses)
+    max_freq = max(counter.values())
+    return [x for x in counter.keys() if counter[x] == max_freq]
+"""
+
 def DLCS(clauses):
     counter = OccurenciesCounter(clauses)
     max_freq = max(counter.values())
     return [x for x in counter.keys() if counter[x] == max_freq]
 
-#TODO: try to call it
+
 def DLIS(clauses):
     counter = PosNegCounter(clauses)
     max_freq = max(counter.values())
     return [x for x in counter.keys() if counter[x] == max_freq]
 
-#TODO: try to call it
+
 def JW(clauses):
     weighted_counter = weightedCounter(clauses)
     max_freq = max (weighted_counter.values())
@@ -58,11 +65,13 @@ def JW(clauses):
 #TODO: function MOM needs to be checked, and try to call it
 def MOM(clauses):
     k = 1 #parameter to be set
-    shortest_clauses = min(clauses, key = len)
+    shortest_len = min(clauses, key=len)
+    shortest_clauses = [c for c in clauses if len(clauses) == shortest_len]
     PNcounter = PosNegCounter(shortest_clauses)
     MomValue = {}
     for lit in PNcounter.keys():
         function = (PNcounter[lit]+PNcounter[-lit])*2**k + (PNcounter[lit] * PNcounter[-lit])
         MomValue[lit] = function
-    return max(MomValue, key = MomValue.get)
+    max_value = max(MomValue.values())
+    return [x for x in MomValue.keys () if MomValue[x] == max_value]
 

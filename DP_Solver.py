@@ -3,14 +3,19 @@ from sympy import *
 import random
 import time, timeit
 import Heursitics
+import math
+import numpy
 
 # 4x4
 # sudokus_file = "TXT/4x4.txt"
 # location_rules = "sudoku-rules-4x4.txt"
 
 # 9x9
-sudokus_file = "TXT/1000 sudokus.txt"
-# sudokus_file = "TXT/top100.sdk.txt"  # average time: 2.5473659467697143  with a std of  2.757161616124923
+#sudokus_file = "TXT/ForHeurCheck.txt"
+sudokus_file = "TXT/top100.sdk.txt"
+# RANDOM: average time: 2.6395707511901856  with a std of  2.2275945704814886
+#
+
 location_rules = "sudoku-rules.txt"
 
 # 16x16
@@ -60,44 +65,25 @@ def unit_propagation(clauses):
 
         # set literal in literals equal to True or False
         literals[abs(literal)] = literal > 0
+        #unit_clauses = list (clause for clause in clauses if len (clause) == 1)
+
     return literals, clauses
-
-
-# def unit_propagation(clauses):
-#     literals = dict()
-#     # filter clauses if length of clause is 1
-#     unit_clauses = [c[0] for c in clauses if len(c) == 1]
-#
-#     while len(unit_clauses) > 0:
-#         literal = int(unit_clauses[0])
-#
-#         # call the bcp for unit_clauses simplification
-#         clauses = bcp(clauses, literal)
-#         unit_clauses = [c[0] for c in clauses if len(c) == 1]
-#
-#         # even if I checked in the clauses and there is no unit clause for -390, only for 390
-#
-#         # contradiction check
-#         for unit in unit_clauses:
-#             if -unit in unit_clauses:
-#                 return None, None
-#
-#         # set x in literals equal to True or False
-#         literals[abs(literal)] = literal > 0
-#
-#     return literals, clauses
 
 
 def dp_solver(clauses, literals):
     if clauses is None:
         return None
 
-    unit_literals, clauses = unit_propagation(clauses)
+    while True:
+        unit_literals, clauses = unit_propagation(clauses)
 
-    if clauses is None:
-        return None
+        if clauses is None:
+            return None
 
-    literals.update(unit_literals)
+        if not unit_literals:
+            break
+
+        literals.update(unit_literals)
 
     if not clauses:
         return literals
@@ -128,7 +114,7 @@ def remove_tautologies(clauses):
     # return list((clause for clause in clauses if not is_clause_tautology(clause)))
     return list(filter(lambda clause: not is_tautology(clause), clauses))
 
-"""
+
 
 def print_solution(literals):
     counter = 0
@@ -149,7 +135,7 @@ def print_solution(literals):
 
     print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
     return matrix
-"""
+
 
 
 #########  heuristic functions ###########
@@ -158,9 +144,9 @@ def var_selection(clauses):
     # comment and uncomment the heuristic that you want to try among:
 
     # return random_selection(clauses)
-    # return DLCS_random(clauses)
-     return DLIS_random(clauses)
-    # return WJ_random(clauses)
+     return DLCS_random(clauses)
+    # return DLIS_random(clauses)
+    # return JW_random(clauses)
     # return MOM_random(clauses)
 
 
@@ -184,16 +170,18 @@ def DLIS_random(clauses):
     literal = random.choice (values)
     return literal
 
-def WJ_random(clauses):
-    values = Heursitics.WJ(clauses)
+def JW_random(clauses):
+    values = Heursitics.JW(clauses)
     literal = random.choice (values)
     return literal
 
 def MOM_random(clauses):
-    return
-
+    values = Heursitics.MOM(clauses)
+    literal = random.choice (values)
+    return literal
+"""
 def verify_solution(literals):
-    #matrix = print_solution(literals)
+    matrix = print_solution(literals)
     size = len(matrix)
     for i in range(size - 1):
         count = [0] * size
@@ -222,6 +210,8 @@ def verify_solution(literals):
             print("invalid solution for block: ", int(i / block_size), i % block_size)
             return
     print("Solution is correct")
+"""
+
 
 
 def main(clauses):
