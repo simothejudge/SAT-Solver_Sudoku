@@ -158,8 +158,8 @@ def var_selection(clauses):
     # comment and uncomment the heuristic that you want to try among:
 
     # return random_selection(clauses)
-     return DLCS_random(clauses)
-    # return DLIS_random(clauses)
+    # return DLCS_random(clauses)
+     return DLIS_random(clauses)
     # return WJ_random(clauses)
     # return MOM_random(clauses)
 
