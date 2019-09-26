@@ -64,13 +64,18 @@ def unit_propagation(clauses):
             return None, None
 
         # set literal in literals equal to True or False
-        literals[abs(literal)] = literal > 0
+        if literal > 0:
+            literals[abs(literal)] = True
+        else:
+            literals[abs(literal)] = False
         #unit_clauses = list (clause for clause in clauses if len (clause) == 1)
 
     return literals, clauses
 
 
 def dp_solver(clauses, literals):
+
+    start = time.time()
     if clauses is None:
         return None
 
@@ -85,21 +90,28 @@ def dp_solver(clauses, literals):
 
         literals.update(unit_literals)
 
+    duration = time.time() - start
+
     if not clauses:
         return literals
 
     # SPLITTING
+    start = time.time ()
     literal = var_selection(clauses)
 
+    #print("variable selection time: "+str(duration))
+
     if literal>0:
-        literals[literal] = True
+        literals[abs(literal)] = True
     else:
-        literals [-literal] = False
+        literals [abs(literal)] = False
 
     solution = dp_solver(bcp(clauses, literal), literals)
     if solution is None:
         literals[literal] = False
         solution = dp_solver(bcp(clauses, -literal), literals)
+
+    duration = time.time () - start
     return solution
 
 
@@ -153,15 +165,19 @@ def var_selection(clauses):
 def random_selection(clauses):
     vars = []
     # 1) random choices
+    start = time.time ()
     for clause in clauses:
         vars += [abs (x) for x in clause if abs (x) not in vars]
     literal = random.choice (vars)
+    duration = time.time () - start
     return literal
 
 def DLCS_random(clauses):
     # 2) Heuristic 1:  DLCS + random choice
+    start = time.time ()
     values = Heursitics.DLCS(clauses)
     literal = random.choice (values)
+    duration = time.time () - start
     return literal
 
 def DLIS_random(clauses):
@@ -179,6 +195,7 @@ def MOM_random(clauses):
     values = Heursitics.MOM(clauses)
     literal = random.choice (values)
     return literal
+
 """
 def verify_solution(literals):
     matrix = print_solution(literals)
@@ -228,11 +245,12 @@ def main(clauses):
 
     # process time for the recursive algorithm
     process_time = time.time() - start
+    print("----------------------------------------------")
     print("DP_Solver Process time: " + str(process_time))
 
     if literals:
-        solution = [x for x in literals.keys() if literals[x] == True]
-        print(solution)
+        #solution = [x for x in literals.keys() if literals[x] == True]
+        #print(solution)
         #verify_solution(literals)
         return 1
     else:
