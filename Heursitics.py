@@ -33,8 +33,6 @@ def weightedCounter(clauses):
             JValue = 2**(-abs(lamda))
             if lit not in sum.keys():
                 sum[lit] = JValue
-            else:
-                sum[lit] += JValue
     return sum
 
 #TODO: process time for each sudoku too long, how come?
