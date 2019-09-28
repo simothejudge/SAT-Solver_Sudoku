@@ -11,11 +11,13 @@ import numpy
 # location_rules = "sudoku-rules-4x4.txt"
 
 # 9x9
-#sudokus_file = "TXT/ForHeurCheck.txt"
+# sudokus_file = "TXT/3sudoku"
+# sudokus_file = "TXT/ForHeurCheck.txt"
 sudokus_file = "TXT/top100.sdk.txt"
 # RANDOM: average time: 2.6395707511901856  with a std of  2.2275945704814886
 #
 
+# location_rules = "TXT/satproblem"
 location_rules = "sudoku-rules.txt"
 
 # 16x16
@@ -54,7 +56,7 @@ def unit_propagation(clauses):
         # for every unit in teh list of unit_clauses we simplify the clauses and set literals to true
         literal = clause[0]
 
-        #contraddiction check
+        # contradiction check
         if [-literal] in unit_clauses:
             return None, None
 
@@ -68,7 +70,9 @@ def unit_propagation(clauses):
             literals[abs(literal)] = True
         else:
             literals[abs(literal)] = False
-        #unit_clauses = list (clause for clause in clauses if len (clause) == 1)
+
+        # literals[abs(literal)] = literal > 0
+        # unit_clauses = list (clause for clause in clauses if len (clause) == 1)
 
     return literals, clauses
 
@@ -97,18 +101,12 @@ def dp_solver(clauses, literals):
 
     # SPLITTING
     start = time.time ()
-    literal = var_selection(clauses)
+    literal = var_selection(clauses, literals)
 
-    #print("variable selection time: "+str(duration))
-
-    if literal>0:
-        literals[abs(literal)] = True
-    else:
-        literals [abs(literal)] = False
-
+    literals[abs(literal)] = literal > 0
     solution = dp_solver(bcp(clauses, literal), literals)
     if solution is None:
-        literals[literal] = False
+        literals[abs(literal)] = literal < 0
         solution = dp_solver(bcp(clauses, -literal), literals)
 
     duration = time.time () - start
@@ -125,7 +123,6 @@ def is_tautology(clause):
 def remove_tautologies(clauses):
     # return list((clause for clause in clauses if not is_clause_tautology(clause)))
     return list(filter(lambda clause: not is_tautology(clause), clauses))
-
 
 
 def print_solution(literals):
@@ -149,52 +146,64 @@ def print_solution(literals):
     return matrix
 
 
-
 #########  heuristic functions ###########
 
-def var_selection(clauses):
+
+def var_selection(clauses, literals):
     # comment and uncomment the heuristic that you want to try among:
-
-    # return random_selection(clauses)
-     return DLCS_random(clauses)
-    # return DLIS_random(clauses)
-    # return JW_random(clauses)
-    # return MOM_random(clauses)
+    # return random_selection(clauses,literals)
+    return DLCS_random(clauses)
 
 
-def random_selection(clauses):
+#  return DLIS_random(clauses)
+# return JW_random(clauses)
+#  return MOM_random(clauses)
+
+
+def random_selection(clauses, literals):
     vars = []
     # 1) random choices
     start = time.time ()
+    # we should also check if the random is not in the processed literals list ?
+
     for clause in clauses:
-        vars += [abs (x) for x in clause if abs (x) not in vars]
-    literal = random.choice (vars)
-    duration = time.time () - start
+        vars += [abs(x) for x in clause if abs(x) not in vars]
+        # for i in clause:
+        #     if i not in literals:
+        #          vars += [abs(x) for x in clause if abs(x) not in vars]
+
+    literal = random.choice(vars)
+    duration = time.time() - start
     return literal
+
 
 def DLCS_random(clauses):
     # 2) Heuristic 1:  DLCS + random choice
-    start = time.time ()
+    start = time.time()
     values = Heursitics.DLCS(clauses)
-    literal = random.choice (values)
-    duration = time.time () - start
+    literal = random.choice(values)
+    duration = time.time() - start
     return literal
+
 
 def DLIS_random(clauses):
     # 3) Heuristic 2:  DLIS + random choice
     values = Heursitics.DLIS(clauses)
-    literal = random.choice (values)
+    literal = random.choice(values)
     return literal
+
 
 def JW_random(clauses):
     values = Heursitics.JW(clauses)
-    literal = random.choice (values)
+    literal = random.choice(values)
     return literal
+
 
 def MOM_random(clauses):
     values = Heursitics.MOM(clauses)
-    literal = random.choice (values)
+    literal = random.choice(values)
     return literal
+
 
 """
 def verify_solution(literals):
@@ -230,6 +239,21 @@ def verify_solution(literals):
 """
 
 
+def verify(literals, clauses):
+    for clause in clauses:
+        satisfied = False
+        for literal in clause:
+            if literal > 0 and literal in literals:
+                satisfied = True
+                continue
+            if literal < 0 and -literal not in literals:
+                satisfied = True
+                continue
+        if not satisfied:
+            print("solution doesn't satisfies clause: ", clause)
+            return
+    print("solution satisfies all clauses")
+
 
 def main(clauses):
     # dictionary containing for each literals (as key value) a boolean value
@@ -249,9 +273,10 @@ def main(clauses):
     print("DP_Solver Process time: " + str(process_time))
 
     if literals:
-        #solution = [x for x in literals.keys() if literals[x] == True]
-        #print(solution)
-        #verify_solution(literals)
+        solution = [x for x in literals.keys() if literals[x] is True]
+        print(numpy.sort(solution), "length: ", len(solution))
+        verify(solution, clauses)
+        # verify_solution(literals)
         return 1
     else:
         print("no solution for this problem")
@@ -268,6 +293,14 @@ if __name__ == '__main__':
 
     times = []
     total_time = 0
+    # start = time.time()
+    solution = main(rules)
+    # runtime = time.time() - start
+
+    # if solution:
+    #     total_time += runtime
+    #     times.append(runtime)
+
     for game in games:
         clauses = DIMACS_reader.get_clauses(game, rules)
 
@@ -281,5 +314,6 @@ if __name__ == '__main__':
         else:
             print("no solution for game :", games.index(game))
 
+    # print("solved", len(times), " games on average time:", numpy.mean(times))
     print("solved", len(times), " puzzle out of ", len(games),
           " games on average time:", numpy.mean(times), " with a std of ", numpy.std(times))

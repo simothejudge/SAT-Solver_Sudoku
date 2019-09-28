@@ -45,11 +45,10 @@ def transform(location):
     sudokus = []
     with open(location) as loc:
         page = loc.read()
-        lines = page.split ('\n')
+        lines = page.split('\n')
         for line in lines:
             sudokus.append(transformline(line))
     return sudokus
-
 
 def load(s):
     # gets the file of rules and puts it in a list of clauses
