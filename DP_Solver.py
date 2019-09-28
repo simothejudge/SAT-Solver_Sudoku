@@ -273,8 +273,8 @@ def main(clauses):
     print("DP_Solver Process time: " + str(process_time))
 
     if literals:
-        #solution = [x for x in literals.keys() if literals[x] is True]
-        #print(numpy.sort(solution), "length: ", len(solution))
+        solution = [x for x in literals.keys() if literals[x] is True]
+        print(numpy.sort(solution), "length: ", len(solution))
         verify(solution, clauses)
         # verify_solution(literals)
         return 1
