@@ -73,12 +73,9 @@ Splitting Optimization --> Variable Selection
     among them, f°(x) = count the occourrencies of lit 
     pick x: max{ [f°(x)+f°(x')]*2^k + f°(x)*f°(x') }
  
- **CDCL_Solver.py**
-  
-  
   
 ****HYPOTHESIS:**** 
 - hard sudokus for people are also hard for computer (based on the process time)
 - difficulty and size relationship? quadratically, exponential, log?
-- 
+- how much the scheme of clues given affect the sudokus resolution? Is a more spread solution 
     

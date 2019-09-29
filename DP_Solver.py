@@ -288,9 +288,6 @@ if __name__ == '__main__':
     rules, size = DIMACS_reader.get_rules(location_rules)
     games = DIMACS_reader.transform(sudokus_file)
 
-    # to check, only one game is played at time, but needed to do a loop for testing all the games
-    # choose a game in games. For example the first one (games[0])
-
     times = []
     total_time = 0
     # start = time.time()
