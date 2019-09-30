@@ -24,9 +24,6 @@ location_rules = "sudoku-rules.txt"
 # sudokus_file = "TXT/16x16.txt"
 # location_rules = "sudoku-rules-16x16.txt"
 
-# TODO: process time has increased: it takes too much even with random selection and even more with the DLSC
-# TODO: test the WJ and MOM
-# TODO: Heursistics checking
 # TODO: Experiments and Statistics
 
 
@@ -152,28 +149,23 @@ def print_solution(literals):
 def var_selection(clauses, literals):
     # comment and uncomment the heuristic that you want to try among:
     # return random_selection(clauses,literals)
-    return DLCS_random(clauses)
-
-
-#  return DLIS_random(clauses)
-# return JW_random(clauses)
-#  return MOM_random(clauses)
+      return DLCS_random(clauses)
+    # return DLIS_random(clauses)
+    # return JW_random(clauses)
+    # return MOM_random(clauses)
 
 
 def random_selection(clauses, literals):
     vars = []
     # 1) random choices
     start = time.time ()
-    # we should also check if the random is not in the processed literals list ?
 
     for clause in clauses:
         vars += [abs(x) for x in clause if abs(x) not in vars]
-        # for i in clause:
-        #     if i not in literals:
-        #          vars += [abs(x) for x in clause if abs(x) not in vars]
 
     literal = random.choice(vars)
     duration = time.time() - start
+
     return literal
 
 
@@ -288,10 +280,14 @@ if __name__ == '__main__':
     rules, size = DIMACS_reader.get_rules(location_rules)
     games = DIMACS_reader.transform(sudokus_file)
 
-    times = []
+    #global variables
     total_time = 0
+
+    times = []
+
+
     # start = time.time()
-    solution = main(rules)
+    # solution = main(rules)
     # runtime = time.time() - start
 
     # if solution:
@@ -300,6 +296,13 @@ if __name__ == '__main__':
 
     for game in games:
         clauses = DIMACS_reader.get_clauses(game, rules)
+
+        # statistics variables for every game
+        splits_counter = 0
+        backtracks_counter = 0
+        tautologies = 0
+        uc_simplified_counter = 0 #unit clauses simplified on average
+        split_simplified_counter = 0
 
         start = time.time()
         solution = main(clauses)

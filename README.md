@@ -78,4 +78,11 @@ Splitting Optimization --> Variable Selection
 - hard sudokus for people are also hard for computer (based on the process time)
 - difficulty and size relationship? quadratically, exponential, log?
 - how much the scheme of clues given affect the sudokus resolution? Is a more spread solution 
+
+
+IDEA: for every sudoku played, we get the number of values given at first, the actual values, 
+the "hardness" (how to define it? splitting and backtracking and process time), 
+get the smooth/jumpy distributiuon of initial values (maybe establishing an evaluation for smoothness, 
+like no more than 3 appearances of the value for 25 lenght clues) and we see if there is a correlation
+
     
