@@ -4,7 +4,7 @@ import time
 import numpy
 
 import DIMACS_reader
-import Heursitics
+import heuristics
 import verifier
 
 # 4x4
@@ -100,7 +100,7 @@ def dp_solver(clauses, literals):
 
     # SPLITTING
     start = time.time ()
-    literal = var_selection(clauses, literals)
+    literal = heuristics.get_random_literal(clauses, "DLCS")
 
     literals[abs(literal)] = literal > 0
     solution = dp_solver(bcp(clauses, literal), literals)
@@ -122,60 +122,6 @@ def is_tautology(clause):
 def remove_tautologies(clauses):
     # return list((clause for clause in clauses if not is_clause_tautology(clause)))
     return list(filter(lambda clause: not is_tautology(clause), clauses))
-
-
-#########  heuristic functions ###########
-
-
-def var_selection(clauses, literals):
-    # comment and uncomment the heuristic that you want to try among:
-    # return random_selection(clauses,literals)
-      return DLCS_random(clauses)
-    # return DLIS_random(clauses)
-    # return JW_random(clauses)
-    # return MOM_random(clauses)
-
-
-def random_selection(clauses, literals):
-    vars = []
-    # 1) random choices
-    start = time.time ()
-
-    for clause in clauses:
-        vars += [abs(x) for x in clause if abs(x) not in vars]
-
-    literal = random.choice(vars)
-    duration = time.time() - start
-
-    return literal
-
-
-def DLCS_random(clauses):
-    # 2) Heuristic 1:  DLCS + random choice
-    start = time.time()
-    values = Heursitics.DLCS(clauses)
-    literal = random.choice(values)
-    duration = time.time() - start
-    return literal
-
-
-def DLIS_random(clauses):
-    # 3) Heuristic 2:  DLIS + random choice
-    values = Heursitics.DLIS(clauses)
-    literal = random.choice(values)
-    return literal
-
-
-def JW_random(clauses):
-    values = Heursitics.JW(clauses)
-    literal = random.choice(values)
-    return literal
-
-
-def MOM_random(clauses):
-    values = Heursitics.MOM(clauses)
-    literal = random.choice(values)
-    return literal
 
 
 def main(clauses):
