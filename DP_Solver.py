@@ -1,10 +1,11 @@
-import DIMACS_reader
-from sympy import *
 import random
-import time, timeit
-import Heursitics
-import math
+import time
+
 import numpy
+
+import DIMACS_reader
+import Heursitics
+import verifier
 
 # 4x4
 # sudokus_file = "TXT/4x4.txt"
@@ -13,6 +14,7 @@ import numpy
 # 9x9
 # sudokus_file = "TXT/3sudoku"
 # sudokus_file = "TXT/ForHeurCheck.txt"
+
 sudokus_file = "TXT/top100.sdk.txt"
 # RANDOM: average time: 2.6395707511901856  with a std of  2.2275945704814886
 #
@@ -122,27 +124,6 @@ def remove_tautologies(clauses):
     return list(filter(lambda clause: not is_tautology(clause), clauses))
 
 
-def print_solution(literals):
-    counter = 0
-    for i in literals:
-        if literals[i] is True:
-            counter += 1
-    size = int(math.sqrt(counter))
-
-    if size < 10:
-        base = 10
-    else:
-        base = 17
-
-    matrix = [[0 for x in range(size)] for x in range(size)]
-    for key, value in literals.items():
-        if key > 0 and value:
-            matrix[int((key / base ** 2)) - 1][int(key / base) % base - 1] = key % base
-
-    print('\n'.join([''.join(['{:3}'.format(item) for item in row]) for row in matrix]))
-    return matrix
-
-
 #########  heuristic functions ###########
 
 
@@ -197,56 +178,6 @@ def MOM_random(clauses):
     return literal
 
 
-"""
-def verify_solution(literals):
-    matrix = print_solution(literals)
-    size = len(matrix)
-    for i in range(size - 1):
-        count = [0] * size
-        for index in matrix[i][:]:
-            count[index - 1] = count[index - 1] + 1
-
-        if not filter(lambda item: item != 1, count):
-            print("invalid solution for row: ", i)
-            return
-
-        count = [0] * size
-        for index in matrix[:][i]:
-            count[index - 1] = count[index - 1] + 1
-
-        if not filter(lambda item: item != 1, count):
-            print("invalid solution for column: ", i)
-            return
-
-        count = [0] * size
-        block_size = int(size ** (1 / 2))
-        for index in flatten(matrix[int(i / block_size):int(i / block_size) + block_size - 1][
-                             (i % block_size): (i % block_size) + block_size - 1]):
-            count[index - 1] = count[index - 1] + 1
-
-        if not filter(lambda item: item != 1, count):
-            print("invalid solution for block: ", int(i / block_size), i % block_size)
-            return
-    print("Solution is correct")
-"""
-
-
-def verify(literals, clauses):
-    for clause in clauses:
-        satisfied = False
-        for literal in clause:
-            if literal > 0 and literal in literals:
-                satisfied = True
-                continue
-            if literal < 0 and -literal not in literals:
-                satisfied = True
-                continue
-        if not satisfied:
-            print("solution doesn't satisfies clause: ", clause)
-            return
-    print("solution satisfies all clauses")
-
-
 def main(clauses):
     # dictionary containing for each literals (as key value) a boolean value
     literals = dict()
@@ -267,7 +198,7 @@ def main(clauses):
     if literals:
         solution = [x for x in literals.keys() if literals[x] is True]
         print(numpy.sort(solution), "length: ", len(solution))
-        verify(solution, clauses)
+        verifier.verify(solution, clauses)
         # verify_solution(literals)
         return 1
     else:
