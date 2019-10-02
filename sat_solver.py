@@ -89,7 +89,7 @@ def sat_solver(clauses, literals, get_random_literal):
     literal = get_random_literal(clauses)
 
     literals[abs(literal)] = literal > 0
-    solution = sat_solver(bcp(clauses, literal), literals, get_random_literal)
+    solution = sat_solver(bcp(clauses, literal), literals.copy(), get_random_literal)
     if solution is None:
         literals[abs(literal)] = literal < 0
         solution = sat_solver(bcp(clauses, -literal), literals, get_random_literal)
