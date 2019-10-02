@@ -5,8 +5,8 @@ import DIMACS_reader
 import heuristics
 import verifier
 
+stats = {"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0}
 
-# TODO: Experiments and Statistics
 
 def is_tautology(clause):
     for literal in clause:
@@ -21,6 +21,7 @@ def remove_tautologies(clauses):
 
 
 def bcp(clauses, literal):
+    stats["bcp"] += 1
     simplified_clauses = []
     for clause in clauses:
         if literal in clause:
@@ -38,6 +39,7 @@ def bcp(clauses, literal):
 
 
 def unit_propagation(clauses):
+    stats["unit"] += 1
     literals = dict()
     # filter clauses if length of clause is 1
     unit_clauses = list(clause for clause in clauses if len(clause) == 1)
@@ -67,9 +69,13 @@ def unit_propagation(clauses):
     return literals, clauses
 
 
-def sat_solver(clauses, literals, get_random_literal):
+def sat_solver(clauses, literals, get_random_literal, level):
+    stats["recursive_call"] += 1
     if clauses is None:
         return None
+
+    if level > stats["depth"]:
+        stats["depth"] = level
 
     while True:
         unit_literals, clauses = unit_propagation(clauses)
@@ -89,10 +95,11 @@ def sat_solver(clauses, literals, get_random_literal):
     literal = get_random_literal(clauses)
 
     literals[abs(literal)] = literal > 0
-    solution = sat_solver(bcp(clauses, literal), literals.copy(), get_random_literal)
+    stats["split"] += 1
+    solution = sat_solver(bcp(clauses, literal), literals.copy(), get_random_literal, level + 1)
     if solution is None:
         literals[abs(literal)] = literal < 0
-        solution = sat_solver(bcp(clauses, -literal), literals, get_random_literal)
+        solution = sat_solver(bcp(clauses, -literal), literals, get_random_literal, level + 1)
 
     return solution
 
@@ -103,10 +110,10 @@ def solve_sat(clauses, method_to_get_random_literal):
     clauses = remove_tautologies(clauses)
 
     # call the solver
-    solution = sat_solver(clauses, {}, method_to_get_random_literal)
-    runtime = time.time() - start
+    solution = sat_solver(clauses, {}, method_to_get_random_literal, 0)
+    stats["time"] = time.time() - start
 
-    return sorted([x for x in solution.keys() if solution[x] is True]), runtime
+    return sorted([x for x in solution.keys() if solution[x] is True]), stats
 
 
 if __name__ == '__main__':
@@ -116,11 +123,11 @@ if __name__ == '__main__':
     inputfile = args[1]
 
     clauses, size = DIMACS_reader.get_rules(inputfile)
-    solution, time = solve_sat(clauses, heuristics.get_random_literal_method(method))
+    solution, stats = solve_sat(clauses, heuristics.get_random_literal_method(method))
 
     if solution:
         if verifier.verify(solution, clauses):
-            print("solution found in", time, "\n", "solution is:", sorted(solution))
+            print("solution found in", stats["time"], "\n", "solution is:", sorted(solution))
         else:
             print("solution for file", inputfile, "is wrong: \n", sorted(solution))
     else:

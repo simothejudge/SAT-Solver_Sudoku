@@ -36,14 +36,15 @@ def solve_sudokus(sudoku_rules, partial_games, method):
     times = []
     for game in games:
         clauses = DIMACS_reader.get_clauses(game, rules)
-        solution, time = sat_solver.solve_sat(clauses, heuristics.get_random_literal_method(method))
+        solution, stats = sat_solver.solve_sat(clauses, heuristics.get_random_literal_method(method))
 
         if solution:
+            time = stats["time"]
             total_time += time
             times.append(time)
             if verifier.verify(solution, clauses):
                 print("solution found for game", games.index(game), "in", time, "seconds.\n",
-                      "solution is: ", sorted(solution))
+                      "solution is: ", sorted(solution), "\n stats:", stats)
             else:
                 print("solution for game", games.index(game), "is wrong: \n", sorted(solution))
 
