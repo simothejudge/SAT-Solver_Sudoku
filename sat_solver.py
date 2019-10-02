@@ -6,7 +6,7 @@ import heuristics
 import verifier
 
 stats = {"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0}
-
+heuristics_methods = {"-S1": "random", "-S2": "DLCS", "-S3": "DLIS", "-S4": "JW", "-S5": "MOM"}
 
 def is_tautology(clause):
     for literal in clause:
@@ -69,7 +69,7 @@ def unit_propagation(clauses):
     return literals, clauses
 
 
-def sat_solver(clauses, literals, get_random_literal, level):
+def sat_solver(clauses, literals, heuristic_method, level):
     stats["recursive_call"] += 1
     if clauses is None:
         return None
@@ -92,25 +92,25 @@ def sat_solver(clauses, literals, get_random_literal, level):
         return literals
 
     # SPLITTING
-    literal = get_random_literal(clauses)
+    literal = heuristics.get_split_literal(clauses, heuristic_method)
 
     literals[abs(literal)] = literal > 0
     stats["split"] += 1
-    solution = sat_solver(bcp(clauses, literal), literals.copy(), get_random_literal, level + 1)
+    solution = sat_solver(bcp(clauses, literal), literals.copy(), heuristic_method, level + 1)
     if solution is None:
         literals[abs(literal)] = literal < 0
-        solution = sat_solver(bcp(clauses, -literal), literals, get_random_literal, level + 1)
+        solution = sat_solver(bcp(clauses, -literal), literals, heuristic_method, level + 1)
 
     return solution
 
 
-def solve_sat(clauses, method_to_get_random_literal):
+def solve_sat(clauses, heuristic_method):
     start = time.time()
     # check for tautologies just once at the beginning
     clauses = remove_tautologies(clauses)
 
     # call the solver
-    solution = sat_solver(clauses, {}, method_to_get_random_literal, 0)
+    solution = sat_solver(clauses, {}, heuristic_method, 0)
     stats["time"] = time.time() - start
 
     return sorted([x for x in solution.keys() if solution[x] is True]), stats
@@ -118,12 +118,12 @@ def solve_sat(clauses, method_to_get_random_literal):
 
 if __name__ == '__main__':
     # SAT -Sn inputfile
-    args = sys.argv()
-    method = args[0]
-    inputfile = args[1]
+
+    method = sys.argv[1]
+    inputfile = sys.argv[2]
 
     clauses, size = DIMACS_reader.get_rules(inputfile)
-    solution, stats = solve_sat(clauses, heuristics.get_random_literal_method(method))
+    solution, stats = solve_sat(clauses, heuristics_methods[method])
 
     if solution:
         if verifier.verify(solution, clauses):
