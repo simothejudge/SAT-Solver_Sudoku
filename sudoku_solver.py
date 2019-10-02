@@ -1,11 +1,3 @@
-""" IMPORTANT: There shouldn't be two different functions or classes for solver.
-    Sat solver should be able to solve all types of sat problems without defining
-    the type of it, including SUDOKUS.
-    We can remove this class and sat_solver class.
-"""
-
-import sys
-
 import numpy
 
 import DIMACS_reader
@@ -14,33 +6,27 @@ import sat_solver
 import verifier
 
 # 4x4
-# sudokus_file = "TXT/4x4.txt"
-# location_rules = "sudoku-rules-4x4.txt"
+# sudoku_games = "TXT/sudoku_examples/4x4.txt"
+# sudoku_games = "TXT/sudoku_examples/3sudoku"
+# sudoku_games = "TXT/sudoku_examples/ForHeurCheck.txt"
+sudoku_games = "TXT/sudoku_examples/1000 sudokus.txt"  # RANDOM: average time: 2.639570 with a std of  2.227594
 
-# 9x9
-# sudokus_file = "TXT/3sudoku"
-# sudokus_file = "TXT/ForHeurCheck.txt"
-
-sudoku_partial_solutions = "TXT/1000 sudokus.txt"
-# RANDOM: average time: 2.6395707511901856  with a std of  2.2275945704814886
-#
-
-# location_rules = "TXT/satproblem"
-sudoku_rules = "sudoku-rules.txt"
+sudoku_rules = {4: "TXT/sudoku_rules/sudoku-rules-4x4.txt",
+                9: "TXT/sudoku_rules/sudoku-rules.txt",
+                16: "TXT/sudoku_rules/sudoku-rules-16x16.txt"}
 
 
-# 16x16
-# sudokus_file = "TXT/16x16.txt"
-# location_rules = "sudoku-rules-16x16.txt"
-
-
+# This file reads sudoku rules and partial solutions from different files and create one list of clauses and uses
+# sat_solver to solve the sudoku. If there are more than one sudoku provided in partial_games file it solves all of them
+# and calculates mean/std time for all solutions.
 def solve_sudokus(sudoku_rules, partial_games, method):
-    rules, size = DIMACS_reader.get_rules(sudoku_rules)
+    rules, size = DIMACS_reader.get_rules(sudoku_rules[9])
     games = DIMACS_reader.transform(partial_games)
 
     total_time = 0
     times = []
     for game in games:
+
         clauses = DIMACS_reader.get_clauses(game, rules)
         solution, stats = sat_solver.solve_sat(clauses, heuristics.get_random_literal_method(method))
 
@@ -57,8 +43,8 @@ def solve_sudokus(sudoku_rules, partial_games, method):
         else:
             print("no solution found for game", games.index(game))
 
-    print("solved", len(times), "puzzle out of", len(games),
-          " games on average", numpy.mean(times), "seconds with a std of", numpy.std(times))
+    print("solved", len(times), "sudokus out of", len(games),
+          " sudokus on average", numpy.mean(times), "seconds with a std of", numpy.std(times))
 
 
 def method():
@@ -70,14 +56,8 @@ def method():
 
 
 if __name__ == '__main__':
-    args = sys.argv()
-    if args:
-        rules = args[0]
-        partial_solutions = args[1]
-        method = args[2]
-    else:
-        rules = sudoku_rules
-        partial_solutions = sudoku_partial_solutions
-        method = method()
+    rules = sudoku_rules
+    games = sudoku_games
+    method = method()
 
-    solve_sudokus(rules, partial_solutions, method)
+    solve_sudokus(rules, games, method)
