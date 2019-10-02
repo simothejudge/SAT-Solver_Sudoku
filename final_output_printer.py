@@ -1,6 +1,12 @@
 import DIMACS_reader
 
 
+def input_file():
+    filename = "a"
+
+    return filename;
+
+
 def truth_table(clauses, solution):
     truthtable = dict()
     if not solution:

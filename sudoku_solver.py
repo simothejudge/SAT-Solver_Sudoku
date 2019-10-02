@@ -1,3 +1,9 @@
+""" IMPORTANT: There shouldn't be two different functions or classes for solver.
+    Sat solver should be able to solve all types of sat problems without defining
+    the type of it, including SUDOKUS.
+    We can remove this class and sat_solver class.
+"""
+
 import sys
 
 import numpy
