@@ -46,7 +46,7 @@ def weighted_counter(clauses):
 
 # TODO: function MOM needs to be checked, and try to call it
 def mom_counter(clauses):
-    k = 1  # parameter to be set
+    k = 2  # parameter to be set
     shortest_len = len(min(clauses, key=len))
     shortest_clauses = [c for c in clauses if len(c) == shortest_len]
     PNcounter = occurrences_counter(shortest_clauses)

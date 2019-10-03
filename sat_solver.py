@@ -5,7 +5,7 @@ import DIMACS_reader
 import heuristics
 import verifier
 
-stats = {"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0}
+stats = {"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0, "smoothness": 0}
 heuristics_methods = {"-S1": "random", "-S2": "DLCS", "-S3": "DLIS", "-S4": "JW", "-S5": "MOM"}
 
 
@@ -17,8 +17,7 @@ def is_tautology(clause):
 
 
 def remove_tautologies(clauses):
-    # return list((clause for clause in clauses if not is_clause_tautology(clause)))
-    return list(filter(lambda clause: not is_tautology(clause), clauses))
+    return [clause for clause in clauses if not is_tautology(clause)]
 
 
 def bcp(clauses, literal):
@@ -41,32 +40,23 @@ def bcp(clauses, literal):
 
 def unit_propagation(clauses):
     stats["unit"] = stats.get("unit", 0) + 1
-    literals = dict()
+    literals = {}
     # filter clauses if length of clause is 1
-    unit_clauses = list(clause for clause in clauses if len(clause) == 1)
+    unit_literals = [clause[0] for clause in clauses if len(clause) == 1]
 
-    for clause in unit_clauses:
-        # for every unit in teh list of unit_clauses we simplify the clauses and set literals to true
-        literal = clause[0]
-
+    # for every unit in the list of unit_literals we simplify the clauses and set literals to true
+    for literal in unit_literals:
         # contradiction check
-        if [-literal] in unit_clauses:
+        if -literal in unit_literals:
             return None, None
 
-        # call the bcp for unit_clauses simplification
+        # call the bcp for unit_literals simplification
         clauses = bcp(clauses, literal)
         if clauses is None:
             return None, None
 
         # set literal in literals equal to True or False
-        if literal > 0:
-            literals[abs(literal)] = True
-        else:
-            literals[abs(literal)] = False
-
-        # literals[abs(literal)] = literal > 0
-        # unit_clauses = list (clause for clause in clauses if len (clause) == 1)
-
+        literals[abs(literal)] = literal > 0
     return literals, clauses
 
 
@@ -75,7 +65,7 @@ def sat_solver(clauses, literals, heuristic_method, level):
     if clauses is None:
         return None
 
-    if level > stats.get("depth", 0):
+    if level > stats.get("depth", -1):
         stats["depth"] = level
 
     while True:
@@ -108,6 +98,7 @@ def sat_solver(clauses, literals, heuristic_method, level):
 
 def solve_sat(clauses, heuristic_method):
     stats.clear()
+    stats.update({"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0, "smoothness": 0})
     start = time.time()
     # check for tautologies just once at the beginning
     clauses = remove_tautologies(clauses)
