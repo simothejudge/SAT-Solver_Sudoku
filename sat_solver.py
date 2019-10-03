@@ -2,11 +2,12 @@ import sys
 import time
 
 import DIMACS_reader
+import final_output_printer
 import heuristics
 import verifier
 
-stats = {"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0, "smoothness": 0}
-heuristics_methods = {"-S1": "random", "-S2": "DLCS", "-S3": "DLIS", "-S4": "JW", "-S5": "MOM"}
+stats = {"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0}
+heuristics_methods = {"-S1": "random", "-S2": "JW", "-S3": "MOM"}
 
 
 def is_tautology(clause):
@@ -98,7 +99,7 @@ def sat_solver(clauses, literals, heuristic_method, level):
 
 def solve_sat(clauses, heuristic_method):
     stats.clear()
-    stats.update({"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0, "smoothness": 0})
+    stats.update({"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0})
     start = time.time()
     # check for tautologies just once at the beginning
     clauses = remove_tautologies(clauses)
@@ -107,7 +108,7 @@ def solve_sat(clauses, heuristic_method):
     solution = sat_solver(clauses, {}, heuristic_method, 0)
     stats["time"] = time.time() - start
 
-    return sorted([x for x in solution.keys() if solution[x] is True]), stats
+    return solution, stats
 
 
 if __name__ == '__main__':
@@ -119,10 +120,13 @@ if __name__ == '__main__':
     clauses, size = DIMACS_reader.get_rules(inputfile)
     solution, stats = solve_sat(clauses, heuristics_methods[method])
 
+    solution = sorted([x for x in solution.keys() if solution[x] is True])
+    final_output_printer.output_printer(clauses, solution, inputfile + ".out")
     if solution:
         if verifier.verify(solution, clauses):
-            print("solution found in", stats["time"], "\n", "solution is:", sorted(solution))
+            print("solution found for", inputfile, "in", stats["time"], "seconds.\n",
+                  "solution is:", solution, "\n stats:", stats)
         else:
-            print("solution for file", inputfile, "is wrong: \n", sorted(solution))
+            print("solution for", inputfile, "is wrong: \n", solution)
     else:
-        print("no solution found for input", inputfile, "with heuristic method", method)
+        print("no solution found for", inputfile, "with heuristic method", method)

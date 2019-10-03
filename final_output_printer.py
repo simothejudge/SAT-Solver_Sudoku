@@ -11,7 +11,7 @@ def truth_table(clauses, solution):
 def output_printer(clauses, solution, output_file_name):
     truthtable = truth_table(clauses, solution)
 
-    with open(output_file_name + '.out', "w") as file:
+    with open(output_file_name, "w") as file:
         if truthtable:
             for i in truthtable:
                 if truthtable[i]:

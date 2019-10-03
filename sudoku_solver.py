@@ -34,15 +34,15 @@ def solve_sudokus(sudoku_rules, partial_games, method):
     for sudoku in sudokus:
         clauses = sudoku + rules
         solution, stats = sat_solver.solve_sat(clauses, method)
+        solution = sorted([x for x in solution.keys() if solution[x] is True])
         stats["smoothness"] = smoothness.get_smoothness(sudoku)
         if solution:
             if verifier.verify(solution, clauses):
                 times.append(stats["time"])
                 print("solution found for sudoku", sudokus.index(sudoku), "in", stats["time"], "seconds.\n",
-                      "solution is: ", sorted(solution), "\n stats:", stats)
+                      "solution is: ", solution, "\n stats:", stats)
             else:
-                print("solution for sudoku", sudokus.index(sudoku), "is wrong: \n", sorted(solution))
-
+                print("solution for sudoku", sudokus.index(sudoku), "is wrong: \n", solution)
         else:
             stats["solution"] = False
             print("no solution found for sudoku", sudokus.index(sudoku))
