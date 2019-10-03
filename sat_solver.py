@@ -8,6 +8,7 @@ import verifier
 stats = {"bcp": 0, "unit": 0, "depth": 0, "split": 0, "recursive_call": 0, "time": 0.0}
 heuristics_methods = {"-S1": "random", "-S2": "DLCS", "-S3": "DLIS", "-S4": "JW", "-S5": "MOM"}
 
+
 def is_tautology(clause):
     for literal in clause:
         if -literal in clause:
@@ -21,7 +22,7 @@ def remove_tautologies(clauses):
 
 
 def bcp(clauses, literal):
-    stats["bcp"] += 1
+    stats["bcp"] = stats.get("bcp", 0) + 1
     simplified_clauses = []
     for clause in clauses:
         if literal in clause:
@@ -39,7 +40,7 @@ def bcp(clauses, literal):
 
 
 def unit_propagation(clauses):
-    stats["unit"] += 1
+    stats["unit"] = stats.get("unit", 0) + 1
     literals = dict()
     # filter clauses if length of clause is 1
     unit_clauses = list(clause for clause in clauses if len(clause) == 1)
@@ -70,11 +71,11 @@ def unit_propagation(clauses):
 
 
 def sat_solver(clauses, literals, heuristic_method, level):
-    stats["recursive_call"] += 1
+    stats["recursive_call"] = stats.get("recursive_call", 0) + 1
     if clauses is None:
         return None
 
-    if level > stats["depth"]:
+    if level > stats.get("depth", 0):
         stats["depth"] = level
 
     while True:
@@ -95,7 +96,8 @@ def sat_solver(clauses, literals, heuristic_method, level):
     literal = heuristics.get_split_literal(clauses, heuristic_method)
 
     literals[abs(literal)] = literal > 0
-    stats["split"] += 1
+
+    stats["split"] = stats.get("split", 0) + 1
     solution = sat_solver(bcp(clauses, literal), literals.copy(), heuristic_method, level + 1)
     if solution is None:
         literals[abs(literal)] = literal < 0
@@ -105,6 +107,7 @@ def sat_solver(clauses, literals, heuristic_method, level):
 
 
 def solve_sat(clauses, heuristic_method):
+    stats.clear()
     start = time.time()
     # check for tautologies just once at the beginning
     clauses = remove_tautologies(clauses)

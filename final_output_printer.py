@@ -1,12 +1,3 @@
-import DIMACS_reader
-
-
-def input_file():
-    filename = "a"
-
-    return filename;
-
-
 def truth_table(clauses, solution):
     truthtable = dict()
     if not solution:
@@ -27,4 +18,14 @@ def output_printer(clauses, solution, output_file_name):
                     file.write(str(i) + " 0\n")
                 else:
                     file.write(str(-i) + " 0\n")
+    file.close()
+
+
+def print_stats(filename, stats):
+    with open(filename, "w+") as file:
+        keys = list(stats[0].keys())
+        file.write(str(keys) + "\n")
+        for stat in stats:
+            values = list([stat.get(key, 0) for key in keys])
+            file.write(str(values) + "\n")
     file.close()

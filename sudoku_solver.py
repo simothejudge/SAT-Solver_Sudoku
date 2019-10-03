@@ -1,6 +1,7 @@
 import numpy
 
 import DIMACS_reader
+import final_output_printer
 import heuristics
 import sat_solver
 import verifier
@@ -23,28 +24,28 @@ def solve_sudokus(sudoku_rules, partial_games, method):
     rules, size = DIMACS_reader.get_rules(sudoku_rules[9])
     games = DIMACS_reader.transform(partial_games)
 
-    total_time = 0
     times = []
+    all_stats = []
+    print("using heuristic method: ", method)
     for game in games:
-
+        print("solving sudoku ", games.index(game), "/", len(games))
         clauses = DIMACS_reader.get_clauses(game, rules)
-        solution, stats = sat_solver.solve_sat(clauses, heuristics.get_random_literal_method(method))
-
+        solution, stats = sat_solver.solve_sat(clauses, method)
         if solution:
-            time = stats["time"]
-            total_time += time
-            times.append(time)
             if verifier.verify(solution, clauses):
-                print("solution found for game", games.index(game), "in", time, "seconds.\n",
-                      "solution is: ", sorted(solution), "\n stats:", stats)
-            else:
-                print("solution for game", games.index(game), "is wrong: \n", sorted(solution))
+                times.append(stats["time"])
+                # print("solution found for game", games.index(game), "in", stats["time"], "seconds.\n",
+                #       "solution is: ", sorted(solution), "\n stats:", stats)
+            # else:
+            # print("solution for game", games.index(game), "is wrong: \n", sorted(solution))
 
         else:
-            print("no solution found for game", games.index(game))
-
-    print("solved", len(times), "sudokus out of", len(games),
-          " sudokus on average", numpy.mean(times), "seconds with a std of", numpy.std(times))
+            stats["solution"] = False
+            # print("no solution found for game", games.index(game))
+        all_stats.append(stats.copy())
+    return all_stats
+    # print("solved", len(times), "sudokus out of", len(games),
+    #       " sudokus on average", numpy.mean(times), "seconds with a std of", numpy.std(times))
 
 
 def method():
@@ -58,6 +59,8 @@ def method():
 if __name__ == '__main__':
     rules = sudoku_rules
     games = sudoku_games
-    method = method()
 
-    solve_sudokus(rules, games, method)
+    stats = {}
+    for method in ["random", "DLCS", "DLIS", "JW", "MOM"]:
+        stats = solve_sudokus(rules, games, method)
+        final_output_printer.print_stats(sudoku_games + "_" + method + ".out", stats)
