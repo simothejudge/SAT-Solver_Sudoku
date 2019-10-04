@@ -11,10 +11,12 @@ import verifier
 # sudoku_games = "TXT/sudoku_examples/3sudoku"
 # sudoku_games = "TXT/sudoku_examples/top100.sdk.txt"
 # sudoku_games = "TXT/sudoku_examples/1000 sudokus.txt"  # RANDOM: average time: 2.639570 with a std of  2.227594
-sudoku_files = ["TXT/sudoku_examples/1000 sudokus.txt",
+sudoku_files = ["TXT/sudoku_examples/ForHeurCheck.txt",
+                "TXT/sudoku_examples/1000 sudokus.txt",
                 "TXT/sudoku_examples/Easy.txt",
                 "TXT/sudoku_examples/Intermediate.txt",
                 "TXT/sudoku_examples/Hard.txt"]
+
 
 sudoku_rules = {4: "TXT/sudoku_rules/sudoku-rules-4x4.txt",
                 9: "TXT/sudoku_rules/sudoku-rules.txt",
@@ -54,10 +56,10 @@ def solve_sudokus(sudoku_rules, partial_games, method):
 
 if __name__ == '__main__':
     rules = sudoku_rules
-    files = sudoku_files
+    files = sudoku_files[3:4]
 
     stats = {}
     for file in files:
-        for method in ["random", "JW", "MOM"]:
+        for method in ["MOM"]:
             stats = solve_sudokus(rules, file, method)
-            final_output_printer.print_stats(file + "_" + method + ".out", stats)
+            final_output_printer.print_stats(file + "1_" + method + ".out", stats)
