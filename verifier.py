@@ -1,8 +1,5 @@
 import math
 
-from sympy import flatten
-
-
 # checks if given solution satisfies all clauses
 def verify(solution, clauses):
     for clause in clauses:
@@ -20,40 +17,6 @@ def verify(solution, clauses):
             print("solution doesn't satisfies clause: ", clause)
             return False
     return True
-
-
-# checks if given sudoku solution is correct
-def verify_sudoku(solution):
-    matrix = print_sudoku(solution)
-    size = len(matrix)
-    for i in range(size - 1):
-        count = [0] * size
-        for index in matrix[i][:]:
-            count[index - 1] = count[index - 1] + 1
-
-        if not filter(lambda item: item != 1, count):
-            print("invalid solution for row: ", i)
-            return
-
-        count = [0] * size
-        for index in matrix[:][i]:
-            count[index - 1] = count[index - 1] + 1
-
-        if not filter(lambda item: item != 1, count):
-            print("invalid solution for column: ", i)
-            return
-
-        count = [0] * size
-        block_size = int(size ** (1 / 2))
-        for index in flatten(matrix[int(i / block_size):int(i / block_size) + block_size - 1][
-                             (i % block_size): (i % block_size) + block_size - 1]):
-            count[index - 1] = count[index - 1] + 1
-
-        if not filter(lambda item: item != 1, count):
-            print("invalid solution for block: ", int(i / block_size), i % block_size)
-            return
-    print("Solution is correct")
-
 
 # prints given sudoku solution in 9x9 human readable matrix
 def print_sudoku(solution):
